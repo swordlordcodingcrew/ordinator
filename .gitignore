@@ -1,3 +1,9 @@
+# CLion
+.idea
+
+# PlatformIO config is user specific
+.pio/
+
 # Prerequisites
 *.d
 
