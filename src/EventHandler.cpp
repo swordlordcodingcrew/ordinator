@@ -20,48 +20,43 @@
  ** -----------------------------------------------------------------------------*/
 #include "EventHandler.h"
 
-EventHandler::EventHandler(HardwareSerial* hws, EasyButton* btn) : hs(hws), _btn(btn)
+EventHandler::EventHandler(HardwareSerial* hws) : hs(hws)
 {
     pinMode(TP_PWR_PIN, PULLUP);
     digitalWrite(TP_PWR_PIN, HIGH);
     pinMode(TP_PIN_PIN, INPUT_PULLUP);
 }
 
-void EventHandler::handleLoop()
+void EventHandler::poll()
 {
-    /*
-    //tp_button.update();
-    gpio_num_t pin = (gpio_num_t)(TP_PIN_PIN & 0x1F);
-    int state=0;
-    if (GPIO_REG_READ(GPIO_ENABLE1_REG) & BIT(pin)){
-        //pin is output - read the GPIO_OUT_REG register
-        state = (GPIO_REG_READ(GPIO_OUT1_REG)  >> pin) & 1U;
-        hs->println(GPIO_REG_READ(GPIO_OUT_REG));
-        hs->println(GPIO_REG_READ(GPIO_OUT1_REG));
-    }
-    else
+    lastPressed5 = lastPressed4;
+    lastPressed4 = lastPressed3;
+    lastPressed3 = lastPressed2;
+    lastPressed2 = lastPressed1;
+    lastPressed1 = isPressed;
+
+    isPressed = gpio_get_level(GPIO_NUM_33);
+
+    if(isPressed)
     {
-        //pin is input - read the GPIO_IN_REG register
-        state = (GPIO_REG_READ(GPIO_IN1_REG)  >> pin) & 1U;
-        hs->println(GPIO_REG_READ(GPIO_IN_REG));
-        hs->println(GPIO_REG_READ(GPIO_IN1_REG));
+        _lastEventAt = millis();
     }
-     */
-    hs->println("__--__--__");
-    hs->println(digitalRead(TP_PIN_PIN)); // this
-    hs->println("__");
 
-    hs->println(GPIO_REG_READ(GPIO_OUT_REG));
-    hs->println(GPIO_REG_READ(GPIO_OUT1_REG));
-    hs->println(GPIO_REG_READ(GPIO_IN_REG));
-    hs->println(GPIO_REG_READ(GPIO_IN1_REG)); // this
+    /*
+    _hs->println("__--__--__");
+    _hs->println(digitalRead(TP_PIN_PIN)); // this
+    _hs->println("__");
 
-    hs->println("**");
+    _hs->println(GPIO_REG_READ(GPIO_OUT_REG));
+    _hs->println(GPIO_REG_READ(GPIO_OUT1_REG));
+    _hs->println(GPIO_REG_READ(GPIO_IN_REG));
+    _hs->println(GPIO_REG_READ(GPIO_IN1_REG)); // this
 
-    hs->println(gpio_get_level(GPIO_NUM_33)); // this
-    hs->println("==");
+    _hs->println("**");
 
-  /*
+    _hs->println(gpio_get_level(GPIO_NUM_33)); // this
+    _hs->println("==");
+
     __--__--__
     1 -> pressed
     __
@@ -73,7 +68,7 @@ void EventHandler::handleLoop()
     1
     ==
     __--__--__
-    0 -> unpressed
+    0 -> not pressed
     __
     249561120
     0
@@ -83,16 +78,41 @@ void EventHandler::handleLoop()
     0
     ==
     */
-
 }
+
+bool EventHandler::timeoutForSleepReached()
+{
+    return _lastEventAt + _maxTimeOut <= millis();
+}
+
+bool EventHandler::isButtonPressed(){
+
+    return isPressed;
+}
+
+bool EventHandler::isButtonJustPressed(){
+
+    return !lastPressed1 && isPressed;
+}
+
+bool EventHandler::isButtonReleased(){
+
+    return !isPressed;
+}
+
+bool EventHandler::isButtonJustReleased(){
+
+    return lastPressed1 && !isPressed;
+}
+
 
 void EventHandler::shortPress()
 {
-
+    // what happens if
 }
 
 void EventHandler::longPress()
 {
-
+    // what happens if
 }
 

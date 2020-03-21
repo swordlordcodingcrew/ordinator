@@ -21,41 +21,33 @@
 
 #include "Ordinator.h"
 
-Ordinator::Ordinator(HardwareSerial* hws)
+Ordinator::Ordinator(HardwareSerial* hws) : _hs(hws)
 {
-    hs = hws;
+
 }
 
-void Ordinator::setup(EasyButton* btn)
+void Ordinator::setup()
 {
     Serial.begin(115200);
     Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN);
     Wire.setClock(400000);
-    /*
-     * eh = new EventHandler(&Serial);
-    eh->poll();
+
+    _eh = new EventHandler(&Serial);
+    _eh->poll();
 
     // initialise the mode manager and implicitly the first mode to be run
-    _mm = new ModeManager(eh, c, &u8g2, &Serial);
+    _mm = new ModeManager(&Serial, &_tft, _eh);
 
     // initialise the display
-    dm = new DisplayManager(_mm, &u8g2, &Serial);
-    dm->begin();
-     */
-
-    eh = new EventHandler(&Serial, btn);
-
-    // initialise the mode manager and implicitly the first mode to be run
-    mm = new ModeManager(&Serial, &_tft);
-
-    // initialise the display
-    dm = new DisplayManager(&Serial, mm, &_tft);
-    dm->begin();
-    dm->showBootLogo();
+    _dm = new DisplayManager(&Serial, _mm, &_tft);
+    _dm->begin();
+    // todo: the boot logo is another module which gets replaced after a given time...
+    _dm->showBootLogo();
 
     // initialise the hardware manager
-    hwm = new HardwareManager(&Serial);
+    _hwm = new HardwareManager(&Serial);
 
+    // TODO fixme
     btStop();
 
     Serial.println("Welcome to your Ordinator. All systems are up.");
@@ -64,31 +56,44 @@ void Ordinator::setup(EasyButton* btn)
 void Ordinator::loop()
 {
     // only enforce framerate if the module wants it enforced
-    if(mm->moduleWantsEnforcedFramerate() && !dm->nextFrame())
+    if(_mm->moduleWantsEnforcedFramerate() && !_dm->nextFrame())
     {
         return;
     }
 
     // for debugging purposes, print when heap changes
     uint32_t freeHeap = ESP.getFreeHeap();
-    if(freeHeap != lastFreeHeap)
+    if(freeHeap != _lastFreeHeap)
     {
         Serial.print("Free Heap: ");
         Serial.println(freeHeap);
 
-        lastFreeHeap = freeHeap;
+        _lastFreeHeap = freeHeap;
     }
 
     // poll fills the bitmask with the current button state. no poll, no updates.
-    //eh->poll();
-    eh->handleLoop();
+    //_eh->poll();
+    _eh->poll();
 
     // have the module check its events
-    mm->checkEvents();
+    _mm->checkEvents();
 
-    // TODO update battery charge status
-    //updateBatteryChargeStatus();
+    // go to sleep if timeout reached and active module is ok with it
+    if (_eh->timeoutForSleepReached() && _mm->canWeGoToSleep())
+    {
+        sleep();
+    }
+
+    // have the LED light up, if Device is charged..
+    _hwm->updateChargeLED();
 
     // have the module paint its UI
-    dm->handleFrame();
+    _dm->handleFrame();
+}
+
+void Ordinator::sleep()
+{
+    //tftSleep(showMsg);
+    _dm->commenceSleep();
+    _hwm->commenceSleep();
 }

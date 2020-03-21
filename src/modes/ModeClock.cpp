@@ -18,18 +18,47 @@
  ** along with this program. If not, see <http://www.gnu.org/licenses/>.
  **
  ** -----------------------------------------------------------------------------*/
+#include "ModeClock.h"
 
-#include <main.h>
-
-Ordinator k = Ordinator(&Serial);
-
-void setup()
+ModeClock::ModeClock(HardwareSerial* hws, TFT_eSPI* s) : BaseMode (hws, s)
 {
-    k.setup();
+
 }
 
-void loop()
+void ModeClock::handleEvents()
 {
-    k.loop();
+
 }
+
+void ModeClock::paintFrameInternal()
+{
+    RTC_Date now = RTC_Date(2020, 3, 21, 12, 13, 14);
+
+    uint8_t xpos = 6;
+    uint8_t ypos = 6;
+    uint16_t colonX = 0;
+    _tft->setTextDatum(TL_DATUM);
+    _tft->setTextColor(0x0821, TFT_BLACK);
+    _tft->drawString("88:88", xpos, ypos, 7);
+    _tft->setTextColor(TFT_GREENYELLOW);
+
+    if (now.hour < 10)
+    {
+        xpos += _tft->drawChar('0', xpos, ypos, 7);
+    }
+
+    xpos += _tft->drawNumber(now.hour, xpos, ypos, 7);
+    //xpos += displayColon(xpos, true, utc);
+    _tft->setTextColor(TFT_GREENYELLOW);
+
+    if (now.minute < 10)
+    {
+        xpos += _tft->drawChar('0', xpos, ypos, 7);
+    }
+
+    _tft->drawNumber(now.minute, xpos, ypos, 7);
+}
+
+
+
 

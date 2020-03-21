@@ -50,6 +50,8 @@ public:
     bool post_render;
     uint8_t lastFrameDurationMs;
 
+    void commenceSleep();
+
 protected:
 
 private:

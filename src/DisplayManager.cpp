@@ -35,7 +35,7 @@ DisplayManager::DisplayManager(HardwareSerial* hs, ModeManager* mm, TFT_eSPI* tf
 void DisplayManager::begin()
 {
     _tft->init();
-    _tft->setRotation(1);
+    _tft->setRotation(0); // 80x160
     _tft->setSwapBytes(true);
     _tft->fillScreen(TFT_BLACK);
     ledcSetup(0, 5000, 8);
@@ -45,7 +45,7 @@ void DisplayManager::begin()
 
 void DisplayManager::showBootLogo()
 {
-    _tft->pushImage(0, 0, 160, 80, area_logo_160x80);
+    _tft->pushImage(0, 0, 80, 160, shield);
 
     delay(2000);
 }
@@ -98,6 +98,7 @@ bool DisplayManager::nextFrame()
     return post_render;
 }
 
+// TODO fixme this is wrong, display manager cant know module...
 void DisplayManager::handleFrame()
 {
     BaseMode* m = _mm->getCurrentModeObject();
@@ -107,4 +108,14 @@ void DisplayManager::handleFrame()
 
     //_hs->println("paint frame");
     m->paintFrame();
+}
+
+void DisplayManager::commenceSleep()
+{
+    _tft->fillScreen(TFT_BLACK);
+    _tft->writecommand(ST7735_SWRESET);
+    delay(100);
+    _tft->writecommand(ST7735_SLPIN);
+    delay(150);
+    _tft->writecommand(ST7735_DISPOFF);
 }

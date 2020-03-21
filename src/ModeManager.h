@@ -25,11 +25,12 @@
 #include "EventHandler.h"
 #include "modes/BaseMode.h"
 #include "modes/ModeAbout.h"
+#include "modes/ModeClock.h"
 
 class ModeManager
 {
 public:
-    ModeManager(HardwareSerial* hs, TFT_eSPI* tft);
+    ModeManager(HardwareSerial* hs, TFT_eSPI* tft, EventHandler* eh);
 
     void checkEvents();
 
@@ -38,17 +39,22 @@ public:
 
     bool moduleWantsEnforcedFramerate();
 
+    bool canWeGoToSleep();
+
     void setMode(uint8_t newMode, uint8_t oldMode, bool storeMode = true);
 
 protected:
 
+    void switchToNextMode();
+
 
 private:
-    uint8_t currentMode = 0;
-    BaseMode* currentModeObject = nullptr;
+    uint8_t _currentMode = 0;
+    BaseMode* _currentModeObject = nullptr;
 
     HardwareSerial* _hs = nullptr;
     TFT_eSPI* _tft = nullptr;
+    EventHandler* _eh = nullptr;
 };
 
 #endif // ORDINATOR_MODEMANAGER_H

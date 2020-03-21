@@ -36,23 +36,24 @@ class Ordinator
 public:
     Ordinator(HardwareSerial* hws);
 
-    void setup(EasyButton* btn);
+    void setup();
     void loop();
 
 protected:
+    void sleep();
 
 private:
 
-    DisplayManager* dm = nullptr;
-    EventHandler* eh = nullptr;
-    ModeManager* mm = nullptr;
-    HardwareManager* hwm = nullptr;
-    HardwareSerial* hs = nullptr;
+    DisplayManager* _dm = nullptr;
+    EventHandler* _eh = nullptr;
+    ModeManager* _mm = nullptr;
+    HardwareManager* _hwm = nullptr;
+    HardwareSerial* _hs = nullptr;
     //Config* c = NULL;
 
     TFT_eSPI _tft = TFT_eSPI();
 
-    uint32_t lastFreeHeap = 0;
+    uint32_t _lastFreeHeap = 0;
 };
 
 #endif //ORDINATOR_ORDINATOR_H

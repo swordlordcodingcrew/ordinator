@@ -22,15 +22,21 @@
 #define ORDINATOR_EVENTHANDLER_H
 
 #include <Arduino.h>
-#include <EasyButton.h>
 #include "hal.hpp"
 
 class EventHandler
 {
     public:
-        EventHandler(HardwareSerial* hws, EasyButton* btn);
+        EventHandler(HardwareSerial* hws);
 
-        void handleLoop();
+        void poll();
+
+        bool isButtonPressed();
+        bool isButtonJustPressed();
+        bool isButtonReleased();
+        bool isButtonJustReleased();
+
+        bool timeoutForSleepReached();
 
         void shortPress();
         void longPress();
@@ -40,12 +46,17 @@ class EventHandler
 
     private:
 
-        EasyButton tp_button = EasyButton(TP_PIN_PIN, 80, true, false);
-        uint32_t time_out = millis();
-        uint16_t max_time_out = 15000;
+        const uint16_t _maxTimeOut = 15000;
+        uint32_t _lastEventAt = 0;
+
+        bool isPressed = false;
+        bool lastPressed1 = false;
+        bool lastPressed2 = false;
+        bool lastPressed3 = false;
+        bool lastPressed4 = false;
+        bool lastPressed5 = false;
 
         HardwareSerial* hs = nullptr;
-        EasyButton* _btn = nullptr;
 };
 
 #endif // ORDINATOR_EVENTHANDLER_H

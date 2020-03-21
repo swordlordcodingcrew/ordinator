@@ -22,27 +22,61 @@
 #define ORDINATOR_HARDWAREMANAGER_H
 
 #include <HardwareSerial.h>
+#include "hal.hpp"
+#include <EEPROM.h>
+#include <esp_adc_cal.h>
+#include <pcf8563.h>
+#include <MPU9250.hpp>
 
 class HardwareManager
 {
 public:
     HardwareManager(HardwareSerial* hws);
 
-    void initClock();
-    void tftInit();
     void activateWifi();
     void deactivateWifi();
     void btStop();
-    void setupADC();
-    void initMPU();
-    void initButton();
-    void setupBattery();
+    float getVoltage();
+    uint8_t calcBatteryPercentage(float volts);
+
+    int16_t getBearing();
+    void calibrateBearing();
+    void calibrateGyro();
+    float getTemperature();
+
+    void commenceSleep();
+
+    // TODO thinking about having a loop method and putting that in there...
+    void updateChargeLED();
 
 protected:
 
+    const int _MAG_CALIBRATION_ADDRESS = 0x00;
+
+    void storeMagBiasInEEPROM(float* magbias);
+    void getMagBiasFromEEPROM(float* magbias);
+
+    void setupADC();
+    void setupBattery();
+    void initMPU();
+    void mpuSleep();
+
+    void initClock();
+    void rtcSleep();
+
+    RTC_Date getClockTime();
+
 private:
 
-    HardwareSerial* hs = nullptr;
+    const float _BATTERY_MIN_V = 3.2;
+    const float _BATTERY_MAX_V = 4.1;
+
+    bool isCharging();
+
+    HardwareSerial* _hs = nullptr;
+    MPU9250 _imu;
+    PCF8563_Class _rtc;
+    uint32_t _vref = 1100;
 };
 
 #endif //ORDINATOR_HARDWAREMANAGER_H

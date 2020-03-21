@@ -35,15 +35,17 @@ public:
     static const uint8_t M_MODE_DEFAULT = 0;
 
     static const uint8_t M_SELECT_MODE  = 0;
-    static const uint8_t M_LOGO         = 1;
-    static const uint8_t M_ABOUT        = 2;
-    static const uint8_t M_HELIX        = 3;
+    static const uint8_t M_CLOCK        = 1;
+    static const uint8_t M_HELIX        = 2;
+    static const uint8_t M_LOGO         = 3;
+    static const uint8_t M_ABOUT        = 4;
 
     virtual void handleEvents();
     virtual void paintFrame();
     virtual void paintFrameInternal();
     virtual void cleanup();
     virtual bool getEnforceFramerate();
+    virtual bool canWeGoToSleep();
 
     /// Clears display.
     void clear();

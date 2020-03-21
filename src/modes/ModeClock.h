@@ -18,18 +18,27 @@
  ** along with this program. If not, see <http://www.gnu.org/licenses/>.
  **
  ** -----------------------------------------------------------------------------*/
+#ifndef ORDINATOR_MODECLOCK_H
+#define ORDINATOR_MODECLOCK_H
 
-#include <main.h>
+#include "../EventHandler.h"
+#include "BaseMode.h"
+#include <pcf8563.h>
 
-Ordinator k = Ordinator(&Serial);
-
-void setup()
+class ModeClock : public BaseMode
 {
-    k.setup();
-}
+public:
+    ModeClock(HardwareSerial* hws, TFT_eSPI* s);
 
-void loop()
-{
-    k.loop();
-}
+    void handleEvents();
+    void paintFrameInternal();
 
+protected:
+
+
+private:
+
+
+};
+
+#endif // ORDINATOR_MODECLOCK_H

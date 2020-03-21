@@ -86,6 +86,11 @@ bool BaseMode::getEnforceFramerate()
     return true;
 }
 
+bool BaseMode::canWeGoToSleep()
+{
+    return true;
+}
+
 // Graphics
 
 void BaseMode::clear()
