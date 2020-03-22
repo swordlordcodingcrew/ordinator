@@ -23,6 +23,7 @@
 
 #include <EventHandler.h>
 #include <TFT_eSPI.h>
+#include "HardwareSerial.h"
 
 class BaseMode
 {
@@ -39,6 +40,24 @@ public:
     static const uint8_t M_HELIX        = 2;
     static const uint8_t M_LOGO         = 3;
     static const uint8_t M_ABOUT        = 4;
+
+    /*
+     * color codes
+     *
+     * code	color
+        0x0000	Black
+        0xFFFF	White
+        0xBDF7	Light Gray
+        0x7BEF	Dark Gray
+        0xF800	Red
+        0xFFE0	Yellow
+        0xFBE0	Orange
+        0x79E0	Brown
+        0x7E0	Green
+        0x7FF	Cyan
+        0x1F	Blue
+        0xF81F	Pink
+    */
 
     virtual void handleEvents();
     virtual void paintFrame();
@@ -95,6 +114,8 @@ protected:
 
     HardwareSerial* _hs = nullptr;
     TFT_eSPI* _tft = nullptr;
+
+    TFT_eSprite* _offscreen = nullptr;
 
 private:
     // sinus

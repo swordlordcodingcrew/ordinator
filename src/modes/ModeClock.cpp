@@ -22,7 +22,7 @@
 
 ModeClock::ModeClock(HardwareSerial* hws, TFT_eSPI* s, HardwareManager* hwm) : BaseMode (hws, s), _hwm(hwm)
 {
-    _tft->fillScreen(TFT_BLACK);
+    _offscreen->fillScreen(TFT_BLACK);
 }
 
 void ModeClock::handleEvents()
@@ -37,32 +37,32 @@ void ModeClock::paintFrameInternal()
     uint8_t xpos = 6;
     uint8_t ypos = 6;
     uint16_t colonX = 0;
-    _tft->setTextDatum(TL_DATUM);
-    _tft->setTextColor(0x0821, TFT_BLACK);
-    _tft->drawString("88", xpos, ypos, 7);
-    _tft->setTextColor(TFT_GREENYELLOW);
+    _offscreen->setTextDatum(TL_DATUM);
+    _offscreen->setTextColor(0x0821, TFT_BLACK);
+    _offscreen->drawString("88", xpos, ypos, 7);
+    _offscreen->setTextColor(TFT_GREENYELLOW);
 
     if (now.hour < 10)
     {
-        xpos += _tft->drawChar('0', xpos, ypos, 7);
+        xpos += _offscreen->drawChar('0', xpos, ypos, 7);
     }
 
-    xpos += _tft->drawNumber(now.hour, xpos, ypos, 7);
+    xpos += _offscreen->drawNumber(now.hour, xpos, ypos, 7);
     //xpos += displayColon(xpos, true, utc);
 
-    ypos += 50;
+    ypos += 56;
     xpos = 6;
 
-    _tft->setTextColor(0x0821, TFT_BLACK);
-    _tft->drawString("88", xpos, ypos, 7);
-    _tft->setTextColor(TFT_GREENYELLOW);
+    _offscreen->setTextColor(0x0821, TFT_BLACK);
+    _offscreen->drawString("88", xpos, ypos, 7);
+    _offscreen->setTextColor(TFT_GREENYELLOW);
 
     if (now.minute < 10)
     {
-        xpos += _tft->drawChar('0', xpos, ypos, 7);
+        xpos += _offscreen->drawChar('0', xpos, ypos, 7);
     }
 
-    _tft->drawNumber(now.minute, xpos, ypos, 7);
+    _offscreen->drawNumber(now.minute, xpos, ypos, 7);
 }
 
 

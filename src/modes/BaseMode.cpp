@@ -22,11 +22,14 @@
 
 BaseMode::BaseMode(HardwareSerial* hs, TFT_eSPI* tft) : _hs(hs), _tft(tft)
 {
+    _offscreen = new TFT_eSprite(tft);  // Declare Sprite object "spr" with pointer to "tft" object
+    _offscreen->createSprite(tft->width(), tft->height());
 }
 
 BaseMode::~BaseMode()
 {
     cleanup();
+    delete _offscreen;
 }
 
 void BaseMode::handleEvents()
@@ -42,6 +45,12 @@ void BaseMode::cleanup()
 void BaseMode::paintFrame()
 {
     paintFrameInternal();
+
+    // blit the offscreen to the screen
+    if(_offscreen != nullptr)
+    {
+        _offscreen->pushSprite(0, 0);
+    }
 }
 
 void BaseMode::paintFrameInternal()
@@ -95,12 +104,12 @@ bool BaseMode::canWeGoToSleep()
 
 void BaseMode::clear()
 {
-    fillScreen(1);
+    fillScreen(TFT_BLACK);
 }
 
 void BaseMode::drawPixel(int x, int y, uint8_t color)
 {
-    //u8g2->drawPixel(x, y);
+    _offscreen->drawPixel(x, y, color);
 }
 
 /*uint8_t BaseMode::getPixel(uint8_t x, uint8_t y)
@@ -112,44 +121,42 @@ void BaseMode::drawPixel(int x, int y, uint8_t color)
 
 void BaseMode::drawCircle(int16_t x0, int16_t y0, uint8_t r, uint8_t color)
 {
-    //u8g2->drawCircle(x0, y0, r);
+    _offscreen->drawCircle(x0, y0, r, color);
 }
 
 void BaseMode::fillCircle(int16_t x0, int16_t y0, uint8_t r, uint8_t color)
 {
-    _tft->drawCircle(x0, y0, r, color);
-    //u8g2->drawDisc(x0, y0, r);
+    _offscreen->drawCircle(x0, y0, r, color);
 }
 
 void BaseMode::drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
 {
-    _tft->drawLine(x0, y0, x1, y1, color);
-    //u8g2->drawLine(x0, y0, x1, y1);
+    _offscreen->drawLine(x0, y0, x1, y1, color);
 }
 
 void BaseMode::drawRect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t color)
 {
-    //u8g2->drawFrame(x, y, w, h);
+    _offscreen->drawRect(x, y, w, h, color);
 }
 
 void BaseMode::fillRect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t color)
 {
-    //u8g2->drawBox(x, y, w, h);
+    _offscreen->drawRect(x, y, w, h, color);
 }
 
 void BaseMode::fillScreen(uint8_t color)
 {
-    _tft->fillScreen(color);
+    _offscreen->fillScreen(color);
 }
 
 void BaseMode::drawRoundRect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t r, uint8_t color)
 {
-    //u8g2->drawRFrame(x, y, w, h, r);
+    _offscreen->drawRoundRect(x, y, w, h, r, color);
 }
 
 void BaseMode::fillRoundRect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t r, uint8_t color)
 {
-    //u8g2->drawRBox(x, y, w, h, r);
+    _offscreen->drawRoundRect(x, y, w, h, r, color);
 }
 
 void BaseMode::drawTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t color)
