@@ -20,7 +20,7 @@
  ** -----------------------------------------------------------------------------*/
 #include "DisplayManager.h"
 
-DisplayManager::DisplayManager(HardwareSerial* hs, ModeManager* mm, TFT_eSPI* tft) : _tft(tft), _mm(mm), _hs(hs)
+DisplayManager::DisplayManager(HardwareSerial* hs, TFT_eSPI* tft) : _tft(tft), _hs(hs)
 {
     // frame management
     setFrameRate(60);
@@ -43,11 +43,16 @@ void DisplayManager::begin()
     ledcWrite(0, 185);
 }
 
+TFT_eSPI* DisplayManager::getDisplay()
+{
+    return _tft;
+}
+
 void DisplayManager::showBootLogo()
 {
     _tft->pushImage(0, 0, 80, 160, shield);
 
-    delay(2000);
+    delay(500);
 }
 
 //Frame management
@@ -96,18 +101,6 @@ bool DisplayManager::nextFrame()
     post_render = true;
 
     return post_render;
-}
-
-// TODO fixme this is wrong, display manager cant know module...
-void DisplayManager::handleFrame()
-{
-    BaseMode* m = _mm->getCurrentModeObject();
-
-    //_hs->println("handle events");
-    m->handleEvents();
-
-    //_hs->println("paint frame");
-    m->paintFrame();
 }
 
 void DisplayManager::commenceSleep()

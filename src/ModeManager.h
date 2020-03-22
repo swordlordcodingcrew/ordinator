@@ -23,14 +23,16 @@
 
 #include <Arduino.h>
 #include "EventHandler.h"
+#include "DisplayManager.h"
 #include "modes/BaseMode.h"
 #include "modes/ModeAbout.h"
 #include "modes/ModeClock.h"
+#include "HardwareManager.h"
 
 class ModeManager
 {
 public:
-    ModeManager(HardwareSerial* hs, TFT_eSPI* tft, EventHandler* eh);
+    ModeManager(HardwareSerial* hs, DisplayManager* dm, EventHandler* eh, HardwareManager* hwm);
 
     void checkEvents();
 
@@ -38,6 +40,8 @@ public:
     BaseMode* getCurrentModeObject();
 
     bool moduleWantsEnforcedFramerate();
+
+    void handleLoop();
 
     bool canWeGoToSleep();
 
@@ -53,8 +57,9 @@ private:
     BaseMode* _currentModeObject = nullptr;
 
     HardwareSerial* _hs = nullptr;
-    TFT_eSPI* _tft = nullptr;
+    DisplayManager* _dm = nullptr;
     EventHandler* _eh = nullptr;
+    HardwareManager* _hwm = nullptr;
 };
 
 #endif // ORDINATOR_MODEMANAGER_H

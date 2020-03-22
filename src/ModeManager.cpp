@@ -20,7 +20,7 @@
  ** -----------------------------------------------------------------------------*/
 #include "ModeManager.h"
 
-ModeManager::ModeManager(HardwareSerial* hs, TFT_eSPI* tft, EventHandler* eh) : _hs(hs), _tft(tft), _eh(eh)
+ModeManager::ModeManager(HardwareSerial* hs, DisplayManager* dm, EventHandler* eh, HardwareManager* hwm) : _hs(hs), _dm(dm), _eh(eh), _hwm(hwm)
 {
     setMode(BaseMode::M_MODE_DEFAULT, BaseMode::M_MODE_DEFAULT, false);
     // TODO check button during boot
@@ -45,6 +45,18 @@ ModeManager::ModeManager(HardwareSerial* hs, TFT_eSPI* tft, EventHandler* eh) : 
     }
     */
 }
+
+void ModeManager::handleLoop()
+{
+    BaseMode* m = getCurrentModeObject();
+
+    //_hs->println("handle events");
+    m->handleEvents();
+
+    //_hs->println("paint frame");
+    m->paintFrame();
+}
+
 
 bool ModeManager::moduleWantsEnforcedFramerate()
 {
@@ -203,17 +215,17 @@ void ModeManager::setMode(uint8_t newMode, uint8_t oldMode, bool storeMode)
     switch(_currentMode)
     {
         case BaseMode::M_HELIX:
-            _currentModeObject = new BaseMode(_hs, _tft);
+            _currentModeObject = new BaseMode(_hs, _dm->getDisplay());
             break;
 
         case BaseMode::M_ABOUT:
-            _currentModeObject = new ModeAbout(_hs, _tft);
+            _currentModeObject = new ModeAbout(_hs, _dm->getDisplay());
             break;
         case BaseMode::M_CLOCK:
-            _currentModeObject = new ModeClock(_hs, _tft);
+            _currentModeObject = new ModeClock(_hs, _dm->getDisplay(), _hwm);
             break;
         default:
-            _currentModeObject = new BaseMode(_hs, _tft);
+            _currentModeObject = new ModeClock(_hs, _dm->getDisplay(), _hwm);
             break;
     }
 

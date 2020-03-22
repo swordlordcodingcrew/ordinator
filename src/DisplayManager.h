@@ -23,12 +23,11 @@
 
 #include <TFT_eSPI.h>
 #include "logo.h"
-#include "ModeManager.h"
 
 class DisplayManager
 {
 public:
-    DisplayManager(HardwareSerial* hs, ModeManager* mm, TFT_eSPI* tft);
+    DisplayManager(HardwareSerial* hs, TFT_eSPI* tft);
 
     /// Initializes the hardware
     void begin();
@@ -40,7 +39,7 @@ public:
     bool nextFrame();
     bool everyXFrames(uint8_t frames);
 
-    void handleFrame();
+    TFT_eSPI* getDisplay();
 
     uint8_t frameRate;
     uint16_t frameCount;
@@ -56,7 +55,6 @@ protected:
 
 private:
     TFT_eSPI* _tft = nullptr;
-    ModeManager* _mm = nullptr;
     HardwareSerial* _hs = nullptr;
 };
 

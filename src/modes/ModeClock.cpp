@@ -20,9 +20,9 @@
  ** -----------------------------------------------------------------------------*/
 #include "ModeClock.h"
 
-ModeClock::ModeClock(HardwareSerial* hws, TFT_eSPI* s) : BaseMode (hws, s)
+ModeClock::ModeClock(HardwareSerial* hws, TFT_eSPI* s, HardwareManager* hwm) : BaseMode (hws, s), _hwm(hwm)
 {
-
+    _tft->fillScreen(TFT_BLACK);
 }
 
 void ModeClock::handleEvents()
@@ -32,14 +32,14 @@ void ModeClock::handleEvents()
 
 void ModeClock::paintFrameInternal()
 {
-    RTC_Date now = RTC_Date(2020, 3, 21, 12, 13, 14);
+    RTC_Date now = _hwm->getClockTime();
 
     uint8_t xpos = 6;
     uint8_t ypos = 6;
     uint16_t colonX = 0;
     _tft->setTextDatum(TL_DATUM);
     _tft->setTextColor(0x0821, TFT_BLACK);
-    _tft->drawString("88:88", xpos, ypos, 7);
+    _tft->drawString("88", xpos, ypos, 7);
     _tft->setTextColor(TFT_GREENYELLOW);
 
     if (now.hour < 10)
@@ -49,6 +49,12 @@ void ModeClock::paintFrameInternal()
 
     xpos += _tft->drawNumber(now.hour, xpos, ypos, 7);
     //xpos += displayColon(xpos, true, utc);
+
+    ypos += 50;
+    xpos = 6;
+
+    _tft->setTextColor(0x0821, TFT_BLACK);
+    _tft->drawString("88", xpos, ypos, 7);
     _tft->setTextColor(TFT_GREENYELLOW);
 
     if (now.minute < 10)

@@ -35,17 +35,17 @@ void Ordinator::setup()
     _eh = new EventHandler(&Serial);
     _eh->poll();
 
-    // initialise the mode manager and implicitly the first mode to be run
-    _mm = new ModeManager(&Serial, &_tft, _eh);
+    // initialise the hardware manager
+    _hwm = new HardwareManager(&Serial);
 
     // initialise the display
-    _dm = new DisplayManager(&Serial, _mm, &_tft);
+    _dm = new DisplayManager(&Serial, &_tft);
     _dm->begin();
     // todo: the boot logo is another module which gets replaced after a given time...
     _dm->showBootLogo();
 
-    // initialise the hardware manager
-    _hwm = new HardwareManager(&Serial);
+    // initialise the mode manager and implicitly the first mode to be run
+    _mm = new ModeManager(&Serial, _dm, _eh, _hwm);
 
     // TODO fixme
     btStop();
@@ -88,7 +88,7 @@ void Ordinator::loop()
     _hwm->updateChargeLED();
 
     // have the module paint its UI
-    _dm->handleFrame();
+    _mm->handleLoop();
 }
 
 void Ordinator::sleep()

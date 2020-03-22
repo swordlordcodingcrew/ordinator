@@ -46,6 +46,8 @@ public:
 
     void commenceSleep();
 
+    RTC_Date getClockTime();
+
     // TODO thinking about having a loop method and putting that in there...
     void updateChargeLED();
 
@@ -63,8 +65,6 @@ protected:
 
     void initClock();
     void rtcSleep();
-
-    RTC_Date getClockTime();
 
 private:
 

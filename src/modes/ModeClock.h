@@ -24,11 +24,12 @@
 #include "../EventHandler.h"
 #include "BaseMode.h"
 #include <pcf8563.h>
+#include <HardwareManager.h>
 
 class ModeClock : public BaseMode
 {
 public:
-    ModeClock(HardwareSerial* hws, TFT_eSPI* s);
+    ModeClock(HardwareSerial* hws, TFT_eSPI* s, HardwareManager* hwm);
 
     void handleEvents();
     void paintFrameInternal();
@@ -38,6 +39,7 @@ protected:
 
 private:
 
+    HardwareManager* _hwm = nullptr;
 
 };
 

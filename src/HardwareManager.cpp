@@ -19,7 +19,6 @@
  **
  ** -----------------------------------------------------------------------------*/
 
-#include <MPU9250.hpp>
 #include "HardwareManager.h"
 
 HardwareManager::HardwareManager(HardwareSerial* hws) : _hs(hws)
