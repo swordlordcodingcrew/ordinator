@@ -72,14 +72,13 @@ void Ordinator::loop()
     }
 
     // poll fills the bitmask with the current button state. no poll, no updates.
-    //_eh->poll();
     _eh->poll();
 
     // have the module check its events
     _mm->checkEvents();
 
     // go to sleep if timeout reached and active module is ok with it
-    if (_eh->timeoutForSleepReached() && _mm->canWeGoToSleep())
+    if (_eh->timeoutForSleepReached() && !_eh->isButtonPressed() && _mm->canWeGoToSleep())
     {
         sleep();
     }
@@ -93,7 +92,6 @@ void Ordinator::loop()
 
 void Ordinator::sleep()
 {
-    //tftSleep(showMsg);
     _dm->commenceSleep();
     _hwm->commenceSleep();
 }

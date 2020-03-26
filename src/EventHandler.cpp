@@ -20,11 +20,14 @@
  ** -----------------------------------------------------------------------------*/
 #include "EventHandler.h"
 
-EventHandler::EventHandler(HardwareSerial* hws) : hs(hws)
+EventHandler::EventHandler(HardwareSerial* hws) : _hs(hws)
 {
     pinMode(TP_PWR_PIN, PULLUP);
     digitalWrite(TP_PWR_PIN, HIGH);
     pinMode(TP_PIN_PIN, INPUT_PULLUP);
+
+    // make sure to initialise to now (not boot time)
+    _lastEventAt = millis();
 }
 
 void EventHandler::poll()
@@ -37,9 +40,18 @@ void EventHandler::poll()
 
     isPressed = gpio_get_level(GPIO_NUM_33);
 
-    if(isPressed)
+    if(isButtonJustPressed())
     {
         _lastEventAt = millis();
+        _buttonDownAt = millis();
+        _lastButtonDownDuration = 0;
+    }
+
+    if(isButtonJustReleased())
+    {
+        _lastButtonDownDuration = millis() - _buttonDownAt;
+        _hs->print("released: ");
+        _hs->println(_lastButtonDownDuration);
     }
 
     /*
@@ -82,37 +94,40 @@ void EventHandler::poll()
 
 bool EventHandler::timeoutForSleepReached()
 {
-    return _lastEventAt + _maxTimeOut <= millis();
+    return _lastEventAt + _MAX_TIMEOUT <= millis();
 }
 
-bool EventHandler::isButtonPressed(){
-
+bool EventHandler::isButtonPressed()
+{
     return isPressed;
 }
 
-bool EventHandler::isButtonJustPressed(){
-
+bool EventHandler::isButtonJustPressed()
+{
     return !lastPressed1 && isPressed;
 }
 
-bool EventHandler::isButtonReleased(){
-
+bool EventHandler::isButtonReleased()
+{
     return !isPressed;
 }
 
-bool EventHandler::isButtonJustReleased(){
-
+bool EventHandler::isButtonJustReleased()
+{
     return lastPressed1 && !isPressed;
 }
 
-
-void EventHandler::shortPress()
+uint32_t EventHandler::getButtonDownTime()
 {
-    // what happens if
+    return _lastButtonDownDuration;
 }
 
-void EventHandler::longPress()
+bool EventHandler::buttonWasDownForAtLeast(uint8_t seconds)
 {
-    // what happens if
+    _hs->print("Button down for at least: ");
+    _hs->println(_lastButtonDownDuration);
+    _hs->print("Seconds: ");
+    _hs->println(seconds);
+    return _lastButtonDownDuration >= (seconds * 1000);
 }
 

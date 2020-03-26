@@ -27,6 +27,11 @@
 #include <esp_adc_cal.h>
 #include <pcf8563.h>
 #include <MPU9250.hpp>
+#include "FS.h"
+#include "SPIFFS.h"
+#include <WiFiUdp.h>
+#include <NTP.h>
+#include <WiFi.h>
 
 class HardwareManager
 {
@@ -46,7 +51,8 @@ public:
 
     void commenceSleep();
 
-    RTC_Date getClockTime();
+    RTC_Date getCurrentTime();
+    void adjustRTC();
 
     // TODO thinking about having a loop method and putting that in there...
     void updateChargeLED();
@@ -66,10 +72,15 @@ protected:
     void initClock();
     void rtcSleep();
 
+    void initSPIFFS();
+
 private:
 
     const float _BATTERY_MIN_V = 3.2;
     const float _BATTERY_MAX_V = 4.1;
+
+    const char* SSID = "hardac";
+    const char* PWD = "h4rd4c.KUJH4D!";
 
     bool isCharging();
 

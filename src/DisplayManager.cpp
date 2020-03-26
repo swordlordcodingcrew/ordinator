@@ -40,7 +40,7 @@ void DisplayManager::begin()
     _tft->fillScreen(TFT_BLACK);
     ledcSetup(0, 5000, 8);
     ledcAttachPin(TFT_BL, 0);
-    ledcWrite(0, 185);
+    ledcWrite(0, 256);
 }
 
 TFT_eSPI* DisplayManager::getDisplay()

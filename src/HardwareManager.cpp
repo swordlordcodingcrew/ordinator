@@ -23,6 +23,7 @@
 
 HardwareManager::HardwareManager(HardwareSerial* hws) : _hs(hws)
 {
+    initSPIFFS();
     setupADC();
     initMPU();
     initClock();
@@ -34,6 +35,7 @@ void HardwareManager::commenceSleep()
     mpuSleep();
     deactivateWifi();
     rtcSleep();
+    SPIFFS.end();
     pinMode(39, GPIO_MODE_INPUT);
     esp_sleep_enable_ext1_wakeup(GPIO_SEL_33 | GPIO_SEL_39, ESP_EXT1_WAKEUP_ANY_HIGH);
     esp_deep_sleep_disable_rom_logging();
@@ -50,10 +52,18 @@ bool HardwareManager::isCharging() {
     return !digitalRead(CHARGE_PIN);
 }
 
+void HardwareManager::initSPIFFS()
+{
+    // format spiffs if failed
+    if(!SPIFFS.begin(true)){
+        Serial.println("SPIFFS Mount Failed");
+    }
+}
+
 void HardwareManager::initClock()
 {
     _rtc.begin(Wire);
-    _rtc.check();
+    //_rtc.check();
 }
 
 void HardwareManager::rtcSleep()
@@ -65,13 +75,79 @@ void HardwareManager::rtcSleep()
     _rtc.disableTimer();
 }
 
-RTC_Date HardwareManager::getClockTime()
+RTC_Date HardwareManager::getCurrentTime()
 {
     return _rtc.getDateTime();
 }
 
-void HardwareManager::activateWifi(){}
-void HardwareManager::deactivateWifi(){}
+void HardwareManager::adjustRTC()
+{
+    activateWifi();
+
+    WiFiUDP wifiUdp;
+    NTP ntp(wifiUdp);
+
+    ntp.ruleDST("CEST", Last, Sun, Mar, 2, 120); // last sunday in march 2:00, timetone +120min (+1 GMT + 1h summertime offset)
+    ntp.ruleSTD("CET", Last, Sun, Oct, 3, 60); // last sunday in october 3:00, timezone +60min (+1 GMT)
+    ntp.updateInterval(0);
+    ntp.begin();
+
+    delay(10);
+
+    // only update the internal clock if ntp update succeeded
+    if(ntp.update())
+    {
+        RTC_Date datetime = RTC_Date(ntp.year(), ntp.month(), ntp.day(), ntp.hours(), ntp.minutes(), ntp.seconds());
+        _hs->print("Setting time to: ");
+        _hs->print(datetime.hour);
+        _hs->print(":");
+        _hs->print(datetime.minute);
+        _hs->print(":");
+        _hs->print(datetime.second);
+        _hs->println();
+
+        _rtc.setDateTime(datetime);
+    }
+    else
+    {
+        _hs->print("Not updating time/date.");
+
+        RTC_Date datetime = _rtc.getDateTime();
+        _hs->print("Currently time is: ");
+        _hs->print(datetime.hour);
+        _hs->print(":");
+        _hs->print(datetime.minute);
+        _hs->print(":");
+        _hs->print(datetime.second);
+        _hs->println();
+    }
+
+    ntp.stop();
+
+    deactivateWifi();
+}
+
+void HardwareManager::activateWifi()
+{
+    WiFi.mode(WIFI_STA);
+    delay(1);
+    if (WiFi.status() != WL_CONNECTED)
+    {
+        WiFi.begin(SSID, PWD);
+
+        uint64_t now = millis();
+        while(now + 5000 < millis() || WiFi.status() != WL_CONNECTED)
+        {
+            delay(10);
+            _hs->print(".");
+        }
+        _hs->println(WiFi.status() == WL_CONNECTED);
+    }
+}
+void HardwareManager::deactivateWifi()
+{
+    WiFi.mode(WIFI_OFF);
+}
 void HardwareManager::btStop(){}
 
 void HardwareManager::setupBattery()

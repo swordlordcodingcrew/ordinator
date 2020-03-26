@@ -28,6 +28,7 @@ class ModeAbout : public BaseMode
 {
 public:
     ModeAbout(HardwareSerial* hws, TFT_eSPI* s);
+    ~ModeAbout();
 
     void handleEvents();
     void paintFrameInternal();
@@ -45,8 +46,7 @@ private:
                              "              "
                              " * LEGENDS NEVER DIE * "
                              "              "
-                             "    * mess with the best, die like the rest *   ";
-
+                             "    * now with 100% more pinchability, nudge nudge *   ";
 };
 
 #endif // ORDINATOR_MODEABOUT_H

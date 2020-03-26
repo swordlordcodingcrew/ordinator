@@ -27,6 +27,9 @@
 #include "modes/BaseMode.h"
 #include "modes/ModeAbout.h"
 #include "modes/ModeClock.h"
+#include "modes/ModeLogo.h"
+#include "modes/ModeOTA.h"
+#include "modes/ModeBearing.h"
 #include "HardwareManager.h"
 
 class ModeManager

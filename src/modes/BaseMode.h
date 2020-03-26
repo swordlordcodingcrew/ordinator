@@ -31,15 +31,17 @@ public:
     BaseMode(HardwareSerial* hs, TFT_eSPI* tft);
     virtual ~BaseMode();
 
-    static const uint8_t M_MODE_COUNT   = 3;
+    static const uint8_t M_MODE_COUNT   = 7;
 
     static const uint8_t M_MODE_DEFAULT = 0;
 
     static const uint8_t M_SELECT_MODE  = 0;
     static const uint8_t M_CLOCK        = 1;
-    static const uint8_t M_HELIX        = 2;
-    static const uint8_t M_LOGO         = 3;
+    static const uint8_t M_LOGO         = 2;
+    static const uint8_t M_HELIX        = 3;
     static const uint8_t M_ABOUT        = 4;
+    static const uint8_t M_BEARING      = 5;
+    static const uint8_t M_OTA          = 6;
 
     /*
      * color codes
@@ -59,12 +61,14 @@ public:
         0xF81F	Pink
     */
 
+    virtual void handleEvents(EventHandler* eh);
     virtual void handleEvents();
     virtual void paintFrame();
     virtual void paintFrameInternal();
     virtual void cleanup();
     virtual bool getEnforceFramerate();
     virtual bool canWeGoToSleep();
+    virtual bool canSwitchAway();
 
     /// Clears display.
     void clear();

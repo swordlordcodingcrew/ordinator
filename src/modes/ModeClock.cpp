@@ -18,6 +18,7 @@
  ** along with this program. If not, see <http://www.gnu.org/licenses/>.
  **
  ** -----------------------------------------------------------------------------*/
+#include <sstream>
 #include "ModeClock.h"
 
 ModeClock::ModeClock(HardwareSerial* hws, TFT_eSPI* s, HardwareManager* hwm) : BaseMode (hws, s), _hwm(hwm)
@@ -25,14 +26,59 @@ ModeClock::ModeClock(HardwareSerial* hws, TFT_eSPI* s, HardwareManager* hwm) : B
     _offscreen->fillScreen(TFT_BLACK);
 }
 
-void ModeClock::handleEvents()
+void ModeClock::handleEvents(EventHandler* eh)
 {
+    if(eh->isButtonJustReleased() && eh->buttonWasDownForAtLeast(2))
+    {
+        _tft->fillScreen(TFT_VIOLET);
+        _hwm->adjustRTC();
+    }
 
 }
 
 void ModeClock::paintFrameInternal()
 {
-    RTC_Date now = _hwm->getClockTime();
+    RTC_Date now = _hwm->getCurrentTime();
+
+    _offscreen->pushImage(0, 0, 80, 160, kaerste);
+
+    uint8_t xpos = 6;
+    uint8_t ypos = 12;
+    _offscreen->setTextDatum(TL_DATUM);
+    _offscreen->setTextSize(1);
+    _offscreen->setTextFont(4);
+    _offscreen->setTextColor(TFT_BLACK);
+
+    if (now.hour < 10)
+    {
+        xpos += _offscreen->drawChar('0', xpos, ypos);
+    }
+
+    xpos += _offscreen->drawNumber(now.hour, xpos, ypos);
+    xpos += _offscreen->drawChar(':', xpos, ypos);
+
+    if (now.minute < 10)
+    {
+        xpos += _offscreen->drawChar('0', xpos, ypos);
+    }
+
+    _offscreen->drawNumber(now.minute, xpos, ypos);
+
+    /*
+    std::ostringstream fd;
+    fd << now.day << "." << now.month << "." << now.year;
+
+    _offscreen->setTextFont(2);
+    xpos = 6;
+    ypos = 50;
+    xpos += _offscreen->drawString(fd.str().c_str(), xpos, ypos);
+    */
+    _offscreen->setTextFont(1);
+    xpos = 12;
+    ypos = 50;
+    xpos += _offscreen->drawString("03.03.2020", xpos, ypos);
+
+    /*
 
     uint8_t xpos = 6;
     uint8_t ypos = 6;
@@ -63,6 +109,7 @@ void ModeClock::paintFrameInternal()
     }
 
     _offscreen->drawNumber(now.minute, xpos, ypos, 7);
+    */
 }
 
 

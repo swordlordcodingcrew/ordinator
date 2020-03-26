@@ -21,6 +21,7 @@
 #ifndef ORDINATOR_EVENTHANDLER_H
 #define ORDINATOR_EVENTHANDLER_H
 
+#include <string>
 #include <Arduino.h>
 #include "hal.hpp"
 
@@ -34,20 +35,25 @@ class EventHandler
         bool isButtonPressed();
         bool isButtonJustPressed();
         bool isButtonReleased();
+
         bool isButtonJustReleased();
+        uint32_t getButtonDownTime();
+        bool buttonWasDownForAtLeast(uint8_t seconds);
 
         bool timeoutForSleepReached();
-
-        void shortPress();
-        void longPress();
 
     protected:
 
 
     private:
 
-        const uint16_t _maxTimeOut = 15000;
-        uint32_t _lastEventAt = 0;
+        // go to sleep after 10 seconds (if allowed)
+        const uint16_t _MAX_TIMEOUT = 10000;
+
+        uint64_t _lastEventAt = 0;
+
+        uint64_t _buttonDownAt = 0;
+        uint32_t _lastButtonDownDuration = 0;
 
         bool isPressed = false;
         bool lastPressed1 = false;
@@ -56,7 +62,7 @@ class EventHandler
         bool lastPressed4 = false;
         bool lastPressed5 = false;
 
-        HardwareSerial* hs = nullptr;
+        HardwareSerial* _hs = nullptr;
 };
 
 #endif // ORDINATOR_EVENTHANDLER_H

@@ -25,13 +25,14 @@
 #include "BaseMode.h"
 #include <pcf8563.h>
 #include <HardwareManager.h>
+#include "watchface/kaerste.h"
 
 class ModeClock : public BaseMode
 {
 public:
     ModeClock(HardwareSerial* hws, TFT_eSPI* s, HardwareManager* hwm);
 
-    void handleEvents();
+    void handleEvents(EventHandler* eh);
     void paintFrameInternal();
 
 protected:

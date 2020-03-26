@@ -51,7 +51,7 @@ void ModeManager::handleLoop()
     BaseMode* m = getCurrentModeObject();
 
     //_hs->println("handle events");
-    m->handleEvents();
+    m->handleEvents(_eh);
 
     //_hs->println("paint frame");
     m->paintFrame();
@@ -147,7 +147,7 @@ void ModeManager::checkEvents()
     // or we are in the normal mode
     //  then we switch to the next module
 
-    if(_eh->isButtonJustPressed())
+    if(_eh->isButtonJustReleased() && !_eh->buttonWasDownForAtLeast(2) && _currentModeObject->canSwitchAway())
     {
         switchToNextMode();
     }
@@ -212,22 +212,37 @@ void ModeManager::setMode(uint8_t newMode, uint8_t oldMode, bool storeMode)
         //conf->storeConfig();
     }
 
+    //    static const uint8_t M_CLOCK        = 1;
+    //    static const uint8_t M_LOGO         = 2;
+    //    static const uint8_t M_HELIX        = 3;
+    //    static const uint8_t M_ABOUT        = 4;
+    //    static const uint8_t M_BEARING      = 5;
+    //    static const uint8_t M_OTA          = 6;
     switch(_currentMode)
     {
-        case BaseMode::M_HELIX:
-            _currentModeObject = new BaseMode(_hs, _dm->getDisplay());
-            break;
-
-        case BaseMode::M_ABOUT:
-            _currentModeObject = new ModeAbout(_hs, _dm->getDisplay());
-            break;
         case BaseMode::M_CLOCK:
             _currentModeObject = new ModeClock(_hs, _dm->getDisplay(), _hwm);
             break;
+        case BaseMode::M_LOGO:
+            _currentModeObject = new ModeLogo(_hs, _dm->getDisplay());
+            break;
+        case BaseMode::M_HELIX:
+            _currentModeObject = new BaseMode(_hs, _dm->getDisplay());
+            break;
+        case BaseMode::M_ABOUT:
+            _currentModeObject = new ModeAbout(_hs, _dm->getDisplay());
+            break;
+        case BaseMode::M_BEARING:
+            _currentModeObject = new ModeBearing(_hs, _dm->getDisplay(), _hwm);
+            break;
+        case BaseMode::M_OTA:
+            _currentModeObject = new ModeOTA(_hs, _dm->getDisplay());
+            break;
         default:
+            // Just in case we f*** up, let's display the clock as default...
             _currentModeObject = new ModeClock(_hs, _dm->getDisplay(), _hwm);
             break;
     }
 
-    _hs->println("Object instantiated");
+    _hs->println("New mode started");
 }

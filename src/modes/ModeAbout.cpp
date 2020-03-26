@@ -22,7 +22,14 @@
 
 ModeAbout::ModeAbout(HardwareSerial* hws, TFT_eSPI* s) : BaseMode (hws, s)
 {
+    _tft->fillScreen(TFT_BLACK);
+    _tft->setRotation(1); // 80x160
+}
 
+ModeAbout::~ModeAbout()
+{
+    // make sure to clean up screen...
+    _tft->setRotation(0); // 80x160
 }
 
 void ModeAbout::handleEvents()
@@ -59,22 +66,22 @@ void ModeAbout::paintFrameInternal()
     _tft->fillScreen(TFT_BLACK);
     _tft->setTextColor(TFT_GREENYELLOW);
     _tft->setTextDatum(MC_DATUM);
+    _tft->setTextFont(3);
 
     // wobbly text
     for (int8_t j = 0; j < 13; j++)
     {
         if((position + j) < scrolltext.length())
         {
-            _tft->drawString(scrolltext.substr(position + j, 1).c_str(), (j * 10), 14 - sin(d + (j * 0.4)) * 5, 2);
+            _tft->drawString(scrolltext.substr(position + j, 1).c_str(), (j * 10), 14 - sin(d + (j * 0.4)) * 5);
 
-
+            // For Debugging Purposes...
             //_hs->print("x: ");
             //_hs->print((j * 10));
             //_hs->print("y: ");
             //_hs->print(14 - sin(d + (j * 0.4)) * 5);
             //_hs->print("c: ");
             //_hs->println(scrolltext.substr(position + j, 1).c_str());
-
         }
     }
 

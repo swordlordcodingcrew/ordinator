@@ -32,10 +32,13 @@ BaseMode::~BaseMode()
     delete _offscreen;
 }
 
-void BaseMode::handleEvents()
+void BaseMode::handleEvents(EventHandler* eh)
 {
-    // do nothing
+    // call event handler without param for convenience
+    handleEvents();
 }
+
+void BaseMode::handleEvents(){}
 
 void BaseMode::cleanup()
 {
@@ -98,6 +101,11 @@ bool BaseMode::getEnforceFramerate()
 bool BaseMode::canWeGoToSleep()
 {
     return true;
+}
+
+bool BaseMode::canSwitchAway()
+{
+
 }
 
 // Graphics
