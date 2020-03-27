@@ -18,30 +18,52 @@
  ** along with this program. If not, see <http://www.gnu.org/licenses/>.
  **
  ** -----------------------------------------------------------------------------*/
-#ifndef ORDINATOR_MODECLOCK_H
-#define ORDINATOR_MODECLOCK_H
+#ifndef ORDINATOR_APPOTA_H
+#define ORDINATOR_APPOTA_H
 
+#include <WiFiClient.h>
 #include "../EventHandler.h"
-#include "BaseMode.h"
-#include <pcf8563.h>
-#include <HardwareManager.h>
-#include "watchface/kaerste.h"
+#include "BaseApp.h"
+#include "Update.h"
+#include <WiFiManager.h>
+#include <sstream>
 
-class ModeClock : public BaseMode
+class AppOTA : public BaseApp
 {
 public:
-    ModeClock(HardwareSerial* hws, TFT_eSPI* s, HardwareManager* hwm);
+    AppOTA(HardwareSerial* hws, TFT_eSPI* s);
+    ~AppOTA();
 
     void handleEvents(EventHandler* eh);
     void paintFrameInternal();
+
+    bool canWeGoToSleep();
 
 protected:
 
 
 private:
 
-    HardwareManager* _hwm = nullptr;
+    WiFiClient client;
 
+    // Host => where your copy of Firmware Server runs at
+    std::string host = "192.168.88.88";
+
+    // Standard port of Firmware Server
+    uint16_t port = 8081;
+
+    // Standard URL of Firmware Server
+    std::string bin = "/fw";
+
+    const char* SSID = "hardac";
+    const char* PWD = "h4rd4c.KUJH4D!";
+
+    bool _isInUpdateMode = false;
+    std::string _statusMessage = "";
+
+    void execOTA();
+    std::string getHeaderValue(std::string header, std::string headerName);
+    void setStatusMessage(std::string message);
 };
 
-#endif // ORDINATOR_MODECLOCK_H
+#endif //ORDINATOR_APPOTA_H

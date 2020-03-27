@@ -42,7 +42,7 @@ void EventHandler::poll()
 
     if(isButtonJustPressed())
     {
-        _lastEventAt = millis();
+        resetLastEventTimestamp();
         _buttonDownAt = millis();
         _lastButtonDownDuration = 0;
     }
@@ -90,6 +90,11 @@ void EventHandler::poll()
     0
     ==
     */
+}
+
+void EventHandler::resetLastEventTimestamp()
+{
+    _lastEventAt = millis();
 }
 
 bool EventHandler::timeoutForSleepReached()

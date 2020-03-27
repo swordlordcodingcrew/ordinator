@@ -40,7 +40,7 @@ void DisplayManager::begin()
     _tft->fillScreen(TFT_BLACK);
     ledcSetup(0, 5000, 8);
     ledcAttachPin(TFT_BL, 0);
-    ledcWrite(0, 256);
+    ledcWrite(0, 185);
 }
 
 TFT_eSPI* DisplayManager::getDisplay()
@@ -52,7 +52,7 @@ void DisplayManager::showBootLogo()
 {
     _tft->pushImage(0, 0, 80, 160, shield);
 
-    delay(500);
+    delay(250);
 }
 
 //Frame management

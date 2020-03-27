@@ -32,6 +32,7 @@
 #include <WiFiUdp.h>
 #include <NTP.h>
 #include <WiFi.h>
+#include <BLEDevice.h>
 
 class HardwareManager
 {
@@ -40,21 +41,28 @@ public:
 
     void activateWifi();
     void deactivateWifi();
-    void btStop();
+    bool isWifiRunning();
+    bool isWifiConnected();
+    void activateBLEServer();
+    void deactivateBT();
+    void deactivateBLEServer();
+    bool isBTRunning();
+    bool isBLEServerRunning();
+
+    void commenceSleep();
+
     float getVoltage();
     uint8_t calcBatteryPercentage(float volts);
+    bool isBatteryCharging();
 
     int16_t getBearing();
     void calibrateBearing();
     void calibrateGyro();
     float getTemperature();
 
-    void commenceSleep();
-
     RTC_Date getCurrentTime();
     void adjustRTC();
 
-    // TODO thinking about having a loop method and putting that in there...
     void updateChargeLED();
 
 protected:
@@ -79,10 +87,11 @@ private:
     const float _BATTERY_MIN_V = 3.2;
     const float _BATTERY_MAX_V = 4.1;
 
+    const std::string SERVICE_UUID = "5f4fc201-1fb5-459e-8fcc-c5c9c331914b";
+    const std::string CHARACTERISTIC_UUID = "bab3483e-36e1-4688-b7f5-ea07361b26a8";
+
     const char* SSID = "hardac";
     const char* PWD = "h4rd4c.KUJH4D!";
-
-    bool isCharging();
 
     HardwareSerial* _hs = nullptr;
     MPU9250 _imu;

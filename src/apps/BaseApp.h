@@ -18,30 +18,32 @@
  ** along with this program. If not, see <http://www.gnu.org/licenses/>.
  **
  ** -----------------------------------------------------------------------------*/
-#ifndef ORDINATOR_BASEMODE_H
-#define ORDINATOR_BASEMODE_H
+#ifndef ORDINATOR_BASEAPP_H
+#define ORDINATOR_BASEAPP_H
 
 #include <EventHandler.h>
 #include <TFT_eSPI.h>
 #include "HardwareSerial.h"
 
-class BaseMode
+class BaseApp
 {
 public:
-    BaseMode(HardwareSerial* hs, TFT_eSPI* tft);
-    virtual ~BaseMode();
+    BaseApp(HardwareSerial* hs, TFT_eSPI* tft);
+    virtual ~BaseApp();
 
-    static const uint8_t M_MODE_COUNT   = 7;
+    static const uint8_t APP_COUNT   = 8;
 
-    static const uint8_t M_MODE_DEFAULT = 0;
+    static const uint8_t APP_DEFAULT = 0;
 
-    static const uint8_t M_SELECT_MODE  = 0;
-    static const uint8_t M_CLOCK        = 1;
-    static const uint8_t M_LOGO         = 2;
-    static const uint8_t M_HELIX        = 3;
-    static const uint8_t M_ABOUT        = 4;
-    static const uint8_t M_BEARING      = 5;
-    static const uint8_t M_OTA          = 6;
+    static const uint8_t APPID_CLOCK_DIGITAL    = 0;
+    static const uint8_t APPID_CLOCK_KAERESTE   = 1;
+    static const uint8_t APPID_LOGO             = 2;
+    static const uint8_t APPID_HELIX            = 3;
+    static const uint8_t APPID_ABOUT            = 4;
+    static const uint8_t APPID_BEARING          = 5;
+    static const uint8_t APPID_BATTERY          = 6;
+    static const uint8_t APPID_TEMPERATURE      = 7;
+    static const uint8_t APPID_OTA              = 8;
 
     /*
      * color codes
@@ -128,4 +130,4 @@ private:
     int c = 129;
 };
 
-#endif // ORDINATOR_BASEMODE_H
+#endif //ORDINATOR_BASEAPP_H

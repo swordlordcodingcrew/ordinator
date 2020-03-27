@@ -18,35 +18,28 @@
  ** along with this program. If not, see <http://www.gnu.org/licenses/>.
  **
  ** -----------------------------------------------------------------------------*/
-#ifndef ORDINATOR_MODEABOUT_H
-#define ORDINATOR_MODEABOUT_H
+#ifndef ORDINATOR_APPBEARING_H
+#define ORDINATOR_APPBEARING_H
 
 #include "../EventHandler.h"
-#include "BaseMode.h"
+#include "BaseApp.h"
+#include "HardwareManager.h"
 
-class ModeAbout : public BaseMode
+class AppBearing : public BaseApp
 {
 public:
-    ModeAbout(HardwareSerial* hws, TFT_eSPI* s);
-    ~ModeAbout();
+    AppBearing(HardwareSerial* hws, TFT_eSPI* s, HardwareManager* hwm);
 
     void handleEvents();
     void paintFrameInternal();
 
 protected:
-    uint8_t frameCount = 0;
-    static const uint8_t everyXFrame = 7;
+
 
 private:
 
-    float_t d = 0.0;
-    uint16_t position = 0; // position where in the string we are (left position of _tft)
-    std::string scrolltext = "              "
-                             "SWORDLORD - the coding crew "
-                             "              "
-                             " * LEGENDS NEVER DIE * "
-                             "              "
-                             "    * now with 100% more pinchability, nudge nudge *   ";
+    HardwareManager* _hwm = nullptr;
+
 };
 
-#endif // ORDINATOR_MODEABOUT_H
+#endif //ORDINATOR_APPBEARING_H

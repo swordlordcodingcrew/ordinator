@@ -18,34 +18,35 @@
  ** along with this program. If not, see <http://www.gnu.org/licenses/>.
  **
  ** -----------------------------------------------------------------------------*/
-#include "BaseMode.h"
+#include "BaseApp.h"
 
-BaseMode::BaseMode(HardwareSerial* hs, TFT_eSPI* tft) : _hs(hs), _tft(tft)
+BaseApp::BaseApp(HardwareSerial* hs, TFT_eSPI* tft) : _hs(hs), _tft(tft)
 {
     _offscreen = new TFT_eSprite(tft);  // Declare Sprite object "spr" with pointer to "tft" object
     _offscreen->createSprite(tft->width(), tft->height());
 }
 
-BaseMode::~BaseMode()
+BaseApp::~BaseApp()
 {
     cleanup();
-    delete _offscreen;
+    _offscreen->deleteSprite();
+    //delete _offscreen;
 }
 
-void BaseMode::handleEvents(EventHandler* eh)
+void BaseApp::handleEvents(EventHandler* eh)
 {
     // call event handler without param for convenience
     handleEvents();
 }
 
-void BaseMode::handleEvents(){}
+void BaseApp::handleEvents(){}
 
-void BaseMode::cleanup()
+void BaseApp::cleanup()
 {
     // do nothing
 }
 
-void BaseMode::paintFrame()
+void BaseApp::paintFrame()
 {
     paintFrameInternal();
 
@@ -56,7 +57,7 @@ void BaseMode::paintFrame()
     }
 }
 
-void BaseMode::paintFrameInternal()
+void BaseApp::paintFrameInternal()
 {
     fillScreen(TFT_BLACK);
 
@@ -93,96 +94,96 @@ void BaseMode::paintFrameInternal()
     d = d + 0.10;
 }
 
-bool BaseMode::getEnforceFramerate()
+bool BaseApp::getEnforceFramerate()
 {
     return true;
 }
 
-bool BaseMode::canWeGoToSleep()
+bool BaseApp::canWeGoToSleep()
 {
     return true;
 }
 
-bool BaseMode::canSwitchAway()
+bool BaseApp::canSwitchAway()
 {
 
 }
 
 // Graphics
 
-void BaseMode::clear()
+void BaseApp::clear()
 {
     fillScreen(TFT_BLACK);
 }
 
-void BaseMode::drawPixel(int x, int y, uint8_t color)
+void BaseApp::drawPixel(int x, int y, uint8_t color)
 {
     _offscreen->drawPixel(x, y, color);
 }
 
-/*uint8_t BaseMode::getPixel(uint8_t x, uint8_t y)
+/*uint8_t BaseApp::getPixel(uint8_t x, uint8_t y)
 {
     uint8_t row = y / 8;
     uint8_t bit_position = y % 8;
     return (sBuffer[(row*SCREEN_WIDTH) + x] & _BV(bit_position)) >> bit_position;
 }*/
 
-void BaseMode::drawCircle(int16_t x0, int16_t y0, uint8_t r, uint8_t color)
+void BaseApp::drawCircle(int16_t x0, int16_t y0, uint8_t r, uint8_t color)
 {
     _offscreen->drawCircle(x0, y0, r, color);
 }
 
-void BaseMode::fillCircle(int16_t x0, int16_t y0, uint8_t r, uint8_t color)
+void BaseApp::fillCircle(int16_t x0, int16_t y0, uint8_t r, uint8_t color)
 {
     _offscreen->drawCircle(x0, y0, r, color);
 }
 
-void BaseMode::drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
+void BaseApp::drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color)
 {
     _offscreen->drawLine(x0, y0, x1, y1, color);
 }
 
-void BaseMode::drawRect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t color)
+void BaseApp::drawRect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t color)
 {
     _offscreen->drawRect(x, y, w, h, color);
 }
 
-void BaseMode::fillRect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t color)
+void BaseApp::fillRect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t color)
 {
     _offscreen->drawRect(x, y, w, h, color);
 }
 
-void BaseMode::fillScreen(uint8_t color)
+void BaseApp::fillScreen(uint8_t color)
 {
     _offscreen->fillScreen(color);
 }
 
-void BaseMode::drawRoundRect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t r, uint8_t color)
+void BaseApp::drawRoundRect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t r, uint8_t color)
 {
     _offscreen->drawRoundRect(x, y, w, h, r, color);
 }
 
-void BaseMode::fillRoundRect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t r, uint8_t color)
+void BaseApp::fillRoundRect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t r, uint8_t color)
 {
     _offscreen->drawRoundRect(x, y, w, h, r, color);
 }
 
-void BaseMode::drawTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t color)
+void BaseApp::drawTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t color)
 {
 
 }
 
-void BaseMode::fillTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t color)
+void BaseApp::fillTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t color)
 {
 
 }
 
-void BaseMode::drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap, uint8_t w, uint8_t h, uint8_t color)
+void BaseApp::drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap, uint8_t w, uint8_t h, uint8_t color)
 {
 
 }
 
-void BaseMode::drawChar(int16_t x, int16_t y, unsigned char c, uint8_t color, uint8_t bg, uint8_t size)
+void BaseApp::drawChar(int16_t x, int16_t y, unsigned char c, uint8_t color, uint8_t bg, uint8_t size)
 {
 
 }

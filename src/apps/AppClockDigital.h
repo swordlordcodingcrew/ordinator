@@ -18,42 +18,29 @@
  ** along with this program. If not, see <http://www.gnu.org/licenses/>.
  **
  ** -----------------------------------------------------------------------------*/
-#ifndef ORDINATOR_ORDINATOR_H
-#define ORDINATOR_ORDINATOR_H
+#ifndef ORDINATOR_APPCLOCKDIGITAL_H
+#define ORDINATOR_APPCLOCKDIGITAL_H
 
-#include <HardwareSerial.h>
-#include <Arduino.h>
-#include "global.h"
-#include <Wire.h>
-#include "hal.hpp"
-#include "DisplayManager.h"
-#include "EventHandler.h"
-#include "AppManager.h"
-#include "HardwareManager.h"
+#include "../EventHandler.h"
+#include "BaseApp.h"
+#include <pcf8563.h>
+#include <HardwareManager.h>
 
-class Ordinator
+class AppClockDigital : public BaseApp
 {
 public:
-    Ordinator(HardwareSerial* hws);
+    AppClockDigital(HardwareSerial* hws, TFT_eSPI* s, HardwareManager* hwm);
 
-    void setup();
-    void loop();
+    void handleEvents(EventHandler* eh);
+    void paintFrameInternal();
 
 protected:
-    void sleep();
+
 
 private:
 
-    DisplayManager* _dm = nullptr;
-    EventHandler* _eh = nullptr;
-    AppManager* _mm = nullptr;
     HardwareManager* _hwm = nullptr;
-    HardwareSerial* _hs = nullptr;
-    //Config* c = NULL;
 
-    TFT_eSPI _tft = TFT_eSPI();
-
-    uint32_t _lastFreeHeap = 0;
 };
 
-#endif //ORDINATOR_ORDINATOR_H
+#endif //ORDINATOR_APPCLOCKDIGITAL_H

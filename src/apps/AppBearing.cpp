@@ -18,42 +18,31 @@
  ** along with this program. If not, see <http://www.gnu.org/licenses/>.
  **
  ** -----------------------------------------------------------------------------*/
-#ifndef ORDINATOR_ORDINATOR_H
-#define ORDINATOR_ORDINATOR_H
+#include "AppBearing.h"
 
-#include <HardwareSerial.h>
-#include <Arduino.h>
-#include "global.h"
-#include <Wire.h>
-#include "hal.hpp"
-#include "DisplayManager.h"
-#include "EventHandler.h"
-#include "AppManager.h"
-#include "HardwareManager.h"
-
-class Ordinator
+AppBearing::AppBearing(HardwareSerial* hws, TFT_eSPI* s, HardwareManager* hwm) : BaseApp (hws, s), _hwm(hwm)
 {
-public:
-    Ordinator(HardwareSerial* hws);
+    _offscreen->fillScreen(TFT_YELLOW);
+}
 
-    void setup();
-    void loop();
+void AppBearing::handleEvents()
+{
 
-protected:
-    void sleep();
+}
 
-private:
+void AppBearing::paintFrameInternal()
+{
+    int16_t bearing = _hwm->getBearing();
+    char bearingText[5] = "---";
+    if (bearing >= 0)
+    {
+        sprintf(bearingText, "%03d", bearing);
+    }
 
-    DisplayManager* _dm = nullptr;
-    EventHandler* _eh = nullptr;
-    AppManager* _mm = nullptr;
-    HardwareManager* _hwm = nullptr;
-    HardwareSerial* _hs = nullptr;
-    //Config* c = NULL;
+    _offscreen->setTextColor(TFT_BLACK, TFT_YELLOW);
+    _offscreen->drawString(bearingText, 6, 20, 4);
+}
 
-    TFT_eSPI _tft = TFT_eSPI();
 
-    uint32_t _lastFreeHeap = 0;
-};
 
-#endif //ORDINATOR_ORDINATOR_H
+

@@ -45,10 +45,12 @@ void Ordinator::setup()
     _dm->showBootLogo();
 
     // initialise the mode manager and implicitly the first mode to be run
-    _mm = new ModeManager(&Serial, _dm, _eh, _hwm);
+    _mm = new AppManager(&Serial, _dm, _eh, _hwm);
 
     // TODO fixme
     btStop();
+
+    _eh->resetLastEventTimestamp();
 
     Serial.println("Welcome to your Ordinator. All systems are up.");
 }
@@ -56,7 +58,7 @@ void Ordinator::setup()
 void Ordinator::loop()
 {
     // only enforce framerate if the module wants it enforced
-    if(_mm->moduleWantsEnforcedFramerate() && !_dm->nextFrame())
+    if(_mm->appWantsEnforcedFramerate() && !_dm->nextFrame())
     {
         return;
     }
@@ -78,7 +80,7 @@ void Ordinator::loop()
     _mm->checkEvents();
 
     // go to sleep if timeout reached and active module is ok with it
-    if (_eh->timeoutForSleepReached() && !_eh->isButtonPressed() && _mm->canWeGoToSleep())
+    if (_eh->timeoutForSleepReached() && !_eh->isButtonPressed() && _mm->canWeGoToSleep() && !_hwm->isBatteryCharging())
     {
         sleep();
     }

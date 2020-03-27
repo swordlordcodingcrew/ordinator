@@ -41,6 +41,7 @@ class EventHandler
         bool buttonWasDownForAtLeast(uint8_t seconds);
 
         bool timeoutForSleepReached();
+        void resetLastEventTimestamp();
 
     protected:
 
@@ -48,7 +49,7 @@ class EventHandler
     private:
 
         // go to sleep after 10 seconds (if allowed)
-        const uint16_t _MAX_TIMEOUT = 10000;
+        const uint16_t _MAX_TIMEOUT = 5000;
 
         uint64_t _lastEventAt = 0;
 

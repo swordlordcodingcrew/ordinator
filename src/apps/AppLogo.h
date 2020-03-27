@@ -18,42 +18,42 @@
  ** along with this program. If not, see <http://www.gnu.org/licenses/>.
  **
  ** -----------------------------------------------------------------------------*/
-#ifndef ORDINATOR_ORDINATOR_H
-#define ORDINATOR_ORDINATOR_H
+#ifndef ORDINATOR_APPLOGO_H
+#define ORDINATOR_APPLOGO_H
 
-#include <HardwareSerial.h>
-#include <Arduino.h>
-#include "global.h"
-#include <Wire.h>
-#include "hal.hpp"
-#include "DisplayManager.h"
-#include "EventHandler.h"
-#include "AppManager.h"
-#include "HardwareManager.h"
+#include "../EventHandler.h"
+#include "BaseApp.h"
+#include "logo.h"
 
-class Ordinator
+/*
+typedef struct{
+    byte r;
+    byte g;
+    byte b;
+    byte unused;
+} SL_Colour;
+ */
+
+class AppLogo : public BaseApp
 {
 public:
-    Ordinator(HardwareSerial* hws);
+    AppLogo(HardwareSerial* hws, TFT_eSPI* s);
+    ~AppLogo();
 
-    void setup();
-    void loop();
+    void handleEvents();
+    void paintFrameInternal();
+
+    bool canWeGoToSleep();
 
 protected:
-    void sleep();
 
 private:
 
-    DisplayManager* _dm = nullptr;
-    EventHandler* _eh = nullptr;
-    AppManager* _mm = nullptr;
-    HardwareManager* _hwm = nullptr;
-    HardwareSerial* _hs = nullptr;
-    //Config* c = NULL;
+    static const uint16_t SCREEN_WIDTH = 80;
+    static const uint16_t SCREEN_HEIGHT = 160;
 
-    TFT_eSPI _tft = TFT_eSPI();
-
-    uint32_t _lastFreeHeap = 0;
+    //static SL_Colour colours[256];
+    //uint8_t fire[SCREEN_WIDTH * SCREEN_HEIGHT];
 };
 
-#endif //ORDINATOR_ORDINATOR_H
+#endif //ORDINATOR_APPLOGO_H

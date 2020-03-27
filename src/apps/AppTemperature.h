@@ -18,42 +18,27 @@
  ** along with this program. If not, see <http://www.gnu.org/licenses/>.
  **
  ** -----------------------------------------------------------------------------*/
-#ifndef ORDINATOR_ORDINATOR_H
-#define ORDINATOR_ORDINATOR_H
+#ifndef ORDINATOR_APPTEMPERATURE_H
+#define ORDINATOR_APPTEMPERATURE_H
 
-#include <HardwareSerial.h>
-#include <Arduino.h>
-#include "global.h"
-#include <Wire.h>
-#include "hal.hpp"
-#include "DisplayManager.h"
-#include "EventHandler.h"
-#include "AppManager.h"
-#include "HardwareManager.h"
+#include <HardwareManager.h>
+#include "../EventHandler.h"
+#include "BaseApp.h"
 
-class Ordinator
+class AppTemperature : public BaseApp
 {
 public:
-    Ordinator(HardwareSerial* hws);
+    AppTemperature(HardwareSerial* hws, TFT_eSPI* s, HardwareManager* hwm);
+    ~AppTemperature();
 
-    void setup();
-    void loop();
+    void handleEvents();
+    void paintFrameInternal();
 
 protected:
-    void sleep();
 
 private:
-
-    DisplayManager* _dm = nullptr;
-    EventHandler* _eh = nullptr;
-    AppManager* _mm = nullptr;
     HardwareManager* _hwm = nullptr;
-    HardwareSerial* _hs = nullptr;
-    //Config* c = NULL;
 
-    TFT_eSPI _tft = TFT_eSPI();
-
-    uint32_t _lastFreeHeap = 0;
 };
 
-#endif //ORDINATOR_ORDINATOR_H
+#endif //ORDINATOR_APPTEMPERATURE_H

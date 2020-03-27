@@ -34,6 +34,7 @@ void HardwareManager::commenceSleep()
 {
     mpuSleep();
     deactivateWifi();
+    deactivateBT();
     rtcSleep();
     SPIFFS.end();
     pinMode(39, GPIO_MODE_INPUT);
@@ -44,10 +45,10 @@ void HardwareManager::commenceSleep()
 
 void HardwareManager::updateChargeLED()
 {
-    digitalWrite(LED_PIN, isCharging());
+    digitalWrite(LED_PIN, isBatteryCharging());
 }
 
-bool HardwareManager::isCharging() {
+bool HardwareManager::isBatteryCharging() {
 
     return !digitalRead(CHARGE_PIN);
 }
@@ -148,7 +149,58 @@ void HardwareManager::deactivateWifi()
 {
     WiFi.mode(WIFI_OFF);
 }
-void HardwareManager::btStop(){}
+
+bool HardwareManager::isWifiRunning()
+{
+
+}
+
+bool HardwareManager::isWifiConnected()
+{
+    return WiFi.status() == WL_CONNECTED;
+}
+
+void HardwareManager::activateBLEServer()
+{
+    BLEDevice::init(std::string("Ordinator.") + ESP.getSketchMD5().c_str());
+    BLEServer *pServer = BLEDevice::createServer();
+    BLEService *pService = pServer->createService(SERVICE_UUID);
+    BLECharacteristic *pCharacteristic = pService->createCharacteristic(
+            CHARACTERISTIC_UUID,
+            BLECharacteristic::PROPERTY_READ |
+            BLECharacteristic::PROPERTY_WRITE
+    );
+
+    pCharacteristic->setValue("Hello World says the Ordinator");
+    pService->start();
+    // BLEAdvertising *pAdvertising = pServer->getAdvertising();  // this still is working for backward compatibility
+    BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
+    pAdvertising->addServiceUUID(SERVICE_UUID);
+    pAdvertising->setScanResponse(true);
+    pAdvertising->setMinPreferred(0x06);  // functions that help with iPhone connections issue
+    pAdvertising->setMinPreferred(0x12);
+    BLEDevice::startAdvertising();
+}
+
+void HardwareManager::deactivateBT()
+{
+    btStop();
+}
+
+void HardwareManager::deactivateBLEServer()
+{
+    btStop();
+}
+
+bool HardwareManager::isBTRunning()
+{
+    return btStarted();
+}
+
+bool HardwareManager::isBLEServerRunning()
+{
+    return btStarted();
+}
 
 void HardwareManager::setupBattery()
 {
@@ -171,7 +223,7 @@ float HardwareManager::getVoltage()
     uint16_t v = analogRead(BATT_ADC_PIN);
 
     // fixme
-    float battery_voltage = (v / 4095.0) * 2.0 * 3.3 * (_vref / 1000.0);
+    float battery_voltage = ((float)v / 4095.0) * 2.0 * 3.3 * (_vref / 1000.0);
 
     return battery_voltage;
 }

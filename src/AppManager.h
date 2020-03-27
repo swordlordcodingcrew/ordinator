@@ -18,31 +18,34 @@
  ** along with this program. If not, see <http://www.gnu.org/licenses/>.
  **
  ** -----------------------------------------------------------------------------*/
-#ifndef ORDINATOR_MODEMANAGER_H
-#define ORDINATOR_MODEMANAGER_H
+#ifndef ORDINATOR_APPMANAGER_H
+#define ORDINATOR_APPMANAGER_H
 
 #include <Arduino.h>
 #include "EventHandler.h"
 #include "DisplayManager.h"
-#include "modes/BaseMode.h"
-#include "modes/ModeAbout.h"
-#include "modes/ModeClock.h"
-#include "modes/ModeLogo.h"
-#include "modes/ModeOTA.h"
-#include "modes/ModeBearing.h"
+#include "apps/BaseApp.h"
+#include "apps/AppAbout.h"
+#include "apps/AppClockKaereste.h"
+#include "apps/AppClockDigital.h"
+#include "apps/AppLogo.h"
+#include "apps/AppOTA.h"
+#include "apps/AppBearing.h"
+#include "apps/AppBattery.h"
+#include "apps/AppTemperature.h"
 #include "HardwareManager.h"
 
-class ModeManager
+class AppManager
 {
 public:
-    ModeManager(HardwareSerial* hs, DisplayManager* dm, EventHandler* eh, HardwareManager* hwm);
+    AppManager(HardwareSerial* hs, DisplayManager* dm, EventHandler* eh, HardwareManager* hwm);
 
     void checkEvents();
 
-    uint8_t getCurrentMode();
-    BaseMode* getCurrentModeObject();
+    uint8_t getCurrentAppID();
+    BaseApp* getCurrentApp();
 
-    bool moduleWantsEnforcedFramerate();
+    bool appWantsEnforcedFramerate();
 
     void handleLoop();
 
@@ -56,8 +59,8 @@ protected:
 
 
 private:
-    uint8_t _currentMode = 0;
-    BaseMode* _currentModeObject = nullptr;
+    uint8_t _currentAppID = 0;
+    BaseApp* _currentApp = nullptr;
 
     HardwareSerial* _hs = nullptr;
     DisplayManager* _dm = nullptr;
@@ -65,4 +68,4 @@ private:
     HardwareManager* _hwm = nullptr;
 };
 
-#endif // ORDINATOR_MODEMANAGER_H
+#endif //ORDINATOR_APPMANAGER_H

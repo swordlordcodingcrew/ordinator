@@ -18,21 +18,25 @@
  ** along with this program. If not, see <http://www.gnu.org/licenses/>.
  **
  ** -----------------------------------------------------------------------------*/
-#include "ModeAbout.h"
+#include "AppAbout.h"
 
-ModeAbout::ModeAbout(HardwareSerial* hws, TFT_eSPI* s) : BaseMode (hws, s)
+AppAbout::AppAbout(HardwareSerial* hws, TFT_eSPI* s) : BaseApp (hws, s)
 {
     _tft->fillScreen(TFT_BLACK);
-    _tft->setRotation(1); // 80x160
+
+    delete _offscreen;
+
+    // create an additional screen in landscape mode
+    _textScreen = new TFT_eSprite(_tft);
+    _textScreen->createSprite(_tft->height(), _tft->width());
 }
 
-ModeAbout::~ModeAbout()
+AppAbout::~AppAbout()
 {
-    // make sure to clean up screen...
-    _tft->setRotation(0); // 80x160
+    _textScreen->deleteSprite();
 }
 
-void ModeAbout::handleEvents()
+void AppAbout::handleEvents()
 {
     frameCount++;
 
@@ -50,7 +54,7 @@ void ModeAbout::handleEvents()
     }
 }
 
-void ModeAbout::paintFrameInternal()
+void AppAbout::paintFrameInternal()
 {
     // slow down the display
     // yeah, this is an ugly hack, but you know, a few days before deadline...
@@ -63,17 +67,17 @@ void ModeAbout::paintFrameInternal()
         frameCount = 0;
     }
 
-    _tft->fillScreen(TFT_BLACK);
-    _tft->setTextColor(TFT_GREENYELLOW);
-    _tft->setTextDatum(MC_DATUM);
-    _tft->setTextFont(3);
+    _textScreen->fillScreen(TFT_BLACK);
+    _textScreen->setTextColor(TFT_GREENYELLOW);
+    _textScreen->setTextDatum(MC_DATUM);
+    _textScreen->setTextFont(4);
 
     // wobbly text
     for (int8_t j = 0; j < 13; j++)
     {
         if((position + j) < scrolltext.length())
         {
-            _tft->drawString(scrolltext.substr(position + j, 1).c_str(), (j * 10), 14 - sin(d + (j * 0.4)) * 5);
+            _textScreen->drawString(scrolltext.substr(position + j, 1).c_str(), (j * 10), 14 - sin(d + (j * 0.4)) * 5);
 
             // For Debugging Purposes...
             //_hs->print("x: ");
@@ -87,6 +91,8 @@ void ModeAbout::paintFrameInternal()
 
     // float d goes 1 step further on the sine evolution
     d = d + 0.10;
+
+    _textScreen->pushRotated(180);
 }
 
 

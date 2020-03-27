@@ -18,42 +18,37 @@
  ** along with this program. If not, see <http://www.gnu.org/licenses/>.
  **
  ** -----------------------------------------------------------------------------*/
-#ifndef ORDINATOR_ORDINATOR_H
-#define ORDINATOR_ORDINATOR_H
+#ifndef ORDINATOR_APPABOUT_H
+#define ORDINATOR_APPABOUT_H
 
-#include <HardwareSerial.h>
-#include <Arduino.h>
-#include "global.h"
-#include <Wire.h>
-#include "hal.hpp"
-#include "DisplayManager.h"
-#include "EventHandler.h"
-#include "AppManager.h"
-#include "HardwareManager.h"
+#include "../EventHandler.h"
+#include "BaseApp.h"
 
-class Ordinator
+class AppAbout : public BaseApp
 {
 public:
-    Ordinator(HardwareSerial* hws);
+    AppAbout(HardwareSerial* hws, TFT_eSPI* s);
+    ~AppAbout();
 
-    void setup();
-    void loop();
+    void handleEvents();
+    void paintFrameInternal();
 
 protected:
-    void sleep();
+    uint8_t frameCount = 0;
+    static const uint8_t everyXFrame = 7;
 
 private:
 
-    DisplayManager* _dm = nullptr;
-    EventHandler* _eh = nullptr;
-    AppManager* _mm = nullptr;
-    HardwareManager* _hwm = nullptr;
-    HardwareSerial* _hs = nullptr;
-    //Config* c = NULL;
+    float_t d = 0.0;
+    uint16_t position = 0; // position where in the string we are (left position of _tft)
+    std::string scrolltext = "              "
+                             "SWORDLORD - the coding crew "
+                             "              "
+                             " * LEGENDS NEVER DIE * "
+                             "              "
+                             "    * now with 100% more pinchability, nudge nudge *   ";
 
-    TFT_eSPI _tft = TFT_eSPI();
-
-    uint32_t _lastFreeHeap = 0;
+    TFT_eSprite* _textScreen = nullptr;
 };
 
-#endif //ORDINATOR_ORDINATOR_H
+#endif //ORDINATOR_APPABOUT_H

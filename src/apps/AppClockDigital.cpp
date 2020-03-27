@@ -19,70 +19,30 @@
  **
  ** -----------------------------------------------------------------------------*/
 #include <sstream>
-#include "ModeClock.h"
+#include "AppClockDigital.h"
 
-ModeClock::ModeClock(HardwareSerial* hws, TFT_eSPI* s, HardwareManager* hwm) : BaseMode (hws, s), _hwm(hwm)
+AppClockDigital::AppClockDigital(HardwareSerial* hws, TFT_eSPI* s, HardwareManager* hwm) : BaseApp (hws, s), _hwm(hwm)
 {
     _offscreen->fillScreen(TFT_BLACK);
 }
 
-void ModeClock::handleEvents(EventHandler* eh)
+void AppClockDigital::handleEvents(EventHandler* eh)
 {
     if(eh->isButtonJustReleased() && eh->buttonWasDownForAtLeast(2))
     {
         _tft->fillScreen(TFT_VIOLET);
         _hwm->adjustRTC();
     }
-
 }
 
-void ModeClock::paintFrameInternal()
+void AppClockDigital::paintFrameInternal()
 {
     RTC_Date now = _hwm->getCurrentTime();
-
-    _offscreen->pushImage(0, 0, 80, 160, kaerste);
-
-    uint8_t xpos = 6;
-    uint8_t ypos = 12;
-    _offscreen->setTextDatum(TL_DATUM);
-    _offscreen->setTextSize(1);
-    _offscreen->setTextFont(4);
-    _offscreen->setTextColor(TFT_BLACK);
-
-    if (now.hour < 10)
-    {
-        xpos += _offscreen->drawChar('0', xpos, ypos);
-    }
-
-    xpos += _offscreen->drawNumber(now.hour, xpos, ypos);
-    xpos += _offscreen->drawChar(':', xpos, ypos);
-
-    if (now.minute < 10)
-    {
-        xpos += _offscreen->drawChar('0', xpos, ypos);
-    }
-
-    _offscreen->drawNumber(now.minute, xpos, ypos);
-
-    /*
-    std::ostringstream fd;
-    fd << now.day << "." << now.month << "." << now.year;
-
-    _offscreen->setTextFont(2);
-    xpos = 6;
-    ypos = 50;
-    xpos += _offscreen->drawString(fd.str().c_str(), xpos, ypos);
-    */
-    _offscreen->setTextFont(1);
-    xpos = 12;
-    ypos = 50;
-    xpos += _offscreen->drawString("03.03.2020", xpos, ypos);
-
-    /*
 
     uint8_t xpos = 6;
     uint8_t ypos = 6;
     uint16_t colonX = 0;
+
     _offscreen->setTextDatum(TL_DATUM);
     _offscreen->setTextColor(0x0821, TFT_BLACK);
     _offscreen->drawString("88", xpos, ypos, 7);
@@ -94,7 +54,6 @@ void ModeClock::paintFrameInternal()
     }
 
     xpos += _offscreen->drawNumber(now.hour, xpos, ypos, 7);
-    //xpos += displayColon(xpos, true, utc);
 
     ypos += 56;
     xpos = 6;
@@ -109,7 +68,6 @@ void ModeClock::paintFrameInternal()
     }
 
     _offscreen->drawNumber(now.minute, xpos, ypos, 7);
-    */
 }
 
 

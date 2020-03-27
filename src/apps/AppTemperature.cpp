@@ -18,42 +18,36 @@
  ** along with this program. If not, see <http://www.gnu.org/licenses/>.
  **
  ** -----------------------------------------------------------------------------*/
-#ifndef ORDINATOR_ORDINATOR_H
-#define ORDINATOR_ORDINATOR_H
+#include "AppTemperature.h"
 
-#include <HardwareSerial.h>
-#include <Arduino.h>
-#include "global.h"
-#include <Wire.h>
-#include "hal.hpp"
-#include "DisplayManager.h"
-#include "EventHandler.h"
-#include "AppManager.h"
-#include "HardwareManager.h"
-
-class Ordinator
+AppTemperature::AppTemperature(HardwareSerial* hws, TFT_eSPI* s, HardwareManager* hwm) : BaseApp (hws, s), _hwm(hwm)
 {
-public:
-    Ordinator(HardwareSerial* hws);
 
-    void setup();
-    void loop();
+}
 
-protected:
-    void sleep();
+AppTemperature::~AppTemperature() {}
 
-private:
+void AppTemperature::handleEvents()
+{
 
-    DisplayManager* _dm = nullptr;
-    EventHandler* _eh = nullptr;
-    AppManager* _mm = nullptr;
-    HardwareManager* _hwm = nullptr;
-    HardwareSerial* _hs = nullptr;
-    //Config* c = NULL;
+}
 
-    TFT_eSPI _tft = TFT_eSPI();
+void AppTemperature::paintFrameInternal()
+{
+    uint8_t xpos = 6;
+    uint8_t ypos = 50;
+    uint16_t colonX = 0;
 
-    uint32_t _lastFreeHeap = 0;
-};
+    _offscreen->setTextDatum(TL_DATUM);
+    _offscreen->setTextColor(TFT_GREENYELLOW);
 
-#endif //ORDINATOR_ORDINATOR_H
+    float temperature = _hwm->getTemperature();
+    char t[8] = "";
+    sprintf(t, "%.1fC", temperature);
+
+    xpos += _offscreen->drawString(t, xpos, ypos, 7);
+}
+
+
+
+
