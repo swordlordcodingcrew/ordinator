@@ -29,10 +29,10 @@
 #include <MPU9250.hpp>
 #include "FS.h"
 #include "SPIFFS.h"
-#include <WiFiUdp.h>
-#include <NTP.h>
 #include <WiFi.h>
 #include <BLEDevice.h>
+#include <rom/rtc.h>
+#include <time.h>
 
 class HardwareManager
 {
@@ -83,6 +83,8 @@ protected:
     void initSPIFFS();
 
 private:
+
+    const char* ntpServer = "europe.pool.ntp.org";
 
     const float _BATTERY_MIN_V = 3.2;
     const float _BATTERY_MAX_V = 4.1;

@@ -23,6 +23,16 @@
 
 HardwareManager::HardwareManager(HardwareSerial* hws) : _hs(hws)
 {
+    setCpuFrequencyMhz(80);
+
+    hws->print("CPU speed: ");
+    hws->println(getCpuFrequencyMhz());
+
+    hws->print("Reset CPU 0: ");
+    hws->println(rtc_get_reset_reason(0));
+    hws->print("Reset CPU 1: ");
+    hws->println(rtc_get_reset_reason(1));
+
     initSPIFFS();
     setupADC();
     initMPU();
@@ -85,20 +95,24 @@ void HardwareManager::adjustRTC()
 {
     activateWifi();
 
-    WiFiUDP wifiUdp;
-    NTP ntp(wifiUdp);
+//    ntp.ruleDST("CEST", Last, Sun, Mar, 2, 120); // last sunday in march 2:00, timetone +120min (+1 GMT + 1h summertime offset)
+//    ntp.ruleSTD("CET", Last, Sun, Oct, 3, 60); // last sunday in october 3:00, timezone +60min (+1 GMT)
 
-    ntp.ruleDST("CEST", Last, Sun, Mar, 2, 120); // last sunday in march 2:00, timetone +120min (+1 GMT + 1h summertime offset)
-    ntp.ruleSTD("CET", Last, Sun, Oct, 3, 60); // last sunday in october 3:00, timezone +60min (+1 GMT)
-    ntp.updateInterval(0);
-    ntp.begin();
+    const long  gmtOffset_sec = 3600;
+    const int   daylightOffset_sec = 3600;
 
-    delay(10);
+    configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
 
-    // only update the internal clock if ntp update succeeded
-    if(ntp.update())
+    struct tm t;
+    if(!getLocalTime(&t))
     {
-        RTC_Date datetime = RTC_Date(ntp.year(), ntp.month(), ntp.day(), ntp.hours(), ntp.minutes(), ntp.seconds());
+        _hs->println("Failed to obtain time, not updating");
+    }
+    else
+    {
+        _hs->println(&t, "New date/time: %A, %B %d %Y %H:%M:%S");
+
+        RTC_Date datetime = RTC_Date(t.tm_year, t.tm_mon, t.tm_mday, t.tm_hour, t.tm_min, t.tm_sec);
         _hs->print("Setting time to: ");
         _hs->print(datetime.hour);
         _hs->print(":");
@@ -109,21 +123,6 @@ void HardwareManager::adjustRTC()
 
         _rtc.setDateTime(datetime);
     }
-    else
-    {
-        _hs->print("Not updating time/date.");
-
-        RTC_Date datetime = _rtc.getDateTime();
-        _hs->print("Currently time is: ");
-        _hs->print(datetime.hour);
-        _hs->print(":");
-        _hs->print(datetime.minute);
-        _hs->print(":");
-        _hs->print(datetime.second);
-        _hs->println();
-    }
-
-    ntp.stop();
 
     deactivateWifi();
 }
@@ -211,7 +210,12 @@ void HardwareManager::setupBattery()
 void HardwareManager::setupADC()
 {
     esp_adc_cal_characteristics_t adc_chars;
-    esp_adc_cal_value_t val_type = esp_adc_cal_characterize((adc_unit_t)ADC_UNIT_1, (adc_atten_t)ADC1_CHANNEL_6, (adc_bits_width_t)ADC_WIDTH_BIT_12, 1100, &adc_chars);
+    esp_adc_cal_value_t val_type = esp_adc_cal_characterize(
+            (adc_unit_t)ADC_UNIT_1,
+            (adc_atten_t)ADC1_CHANNEL_6,
+            (adc_bits_width_t)ADC_WIDTH_BIT_12,
+            1100,
+            &adc_chars);
     if (val_type == ESP_ADC_CAL_VAL_EFUSE_VREF)
     {
         _vref = adc_chars.vref;
@@ -222,7 +226,7 @@ float HardwareManager::getVoltage()
 {
     uint16_t v = analogRead(BATT_ADC_PIN);
 
-    // fixme
+    // Todo fixme
     float battery_voltage = ((float)v / 4095.0) * 2.0 * 3.3 * (_vref / 1000.0);
 
     return battery_voltage;
@@ -230,6 +234,7 @@ float HardwareManager::getVoltage()
 
 uint8_t HardwareManager::calcBatteryPercentage(float volts)
 {
+    // Todo fixme
     float percentage = (volts - _BATTERY_MIN_V) * 100 / (_BATTERY_MAX_V - _BATTERY_MIN_V);
     if (percentage > 100)
     {
