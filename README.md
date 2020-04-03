@@ -1,33 +1,14 @@
-# ordinator
-Extendable firmware for the LILYGO TTGO T-Wristband
+# The Ordinator
+(c) 2020 by SwordLord - the coding crew and contributing authors
 
+The Ordinator is an extendable Open Source firmware for the LILYGO TTGO T-Wristband.
 
+## Infos
 
+Please see the project Wiki for further details about architecture, how to compile your own version and more.
 
+https://github.com/swordlordcodingcrew/ordinator/wiki
 
-## howto
-Initialise the project. Already done, won't be needed anymore
+## Licence
 
-> pio project init --ide clion --board esp32dev
-
-To use CLion as an IDE, or when things wont work as expected, run this command:
-
-> pio project init --ide clion
->
-
-To update middleware
-> pio update
->
-
-To compile
-
-> pio run
->
-
-To upload to the device (attached via USB)
-> pio run -t upload
->
-
-To start the serial monitor
-> pio device monitor
->
+The Ordinator is released under the GNU Affero General Public License. Please see the LICENSE file for details.
