@@ -100,6 +100,8 @@ private:
 
     void commenceSleep();
 
+    std::string translateResetReason();
+
     const char* ntpServer = "europe.pool.ntp.org";
 
     const float _BATTERY_MIN_V = 3.2;
