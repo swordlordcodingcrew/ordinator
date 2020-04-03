@@ -27,6 +27,11 @@ AppTemperature::AppTemperature(HardwareSerial* hws, TFT_eSPI* s, HardwareManager
 
 AppTemperature::~AppTemperature() {}
 
+RunLevel AppTemperature::runLevelNeeded()
+{
+    return RL3;
+}
+
 void AppTemperature::handleEvents()
 {
 

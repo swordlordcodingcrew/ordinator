@@ -34,6 +34,8 @@ public:
     void handleEvents();
     void paintFrameInternal();
 
+    RunLevel runLevelNeeded();
+
 protected:
 
 private:

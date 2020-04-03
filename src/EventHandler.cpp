@@ -22,12 +22,16 @@
 
 EventHandler::EventHandler(HardwareSerial* hws) : _hs(hws)
 {
+    log_d("Initialise EventHandler");
+
     pinMode(TP_PWR_PIN, PULLUP);
     digitalWrite(TP_PWR_PIN, HIGH);
     pinMode(TP_PIN_PIN, INPUT_PULLUP);
 
     // make sure to initialise to now (not boot time)
     _lastEventAt = millis();
+
+    log_d("Initialisation done");
 }
 
 void EventHandler::poll()
@@ -50,8 +54,8 @@ void EventHandler::poll()
     if(isButtonJustReleased())
     {
         _lastButtonDownDuration = millis() - _buttonDownAt;
-        _hs->print("released: ");
-        _hs->println(_lastButtonDownDuration);
+
+        log_d("Button released. Pressed for %d millis.", _lastButtonDownDuration);
     }
 
     /*
@@ -129,10 +133,8 @@ uint32_t EventHandler::getButtonDownTime()
 
 bool EventHandler::buttonWasDownForAtLeast(uint8_t seconds)
 {
-    _hs->print("Button down for at least: ");
-    _hs->println(_lastButtonDownDuration);
-    _hs->print("Seconds: ");
-    _hs->println(seconds);
-    return _lastButtonDownDuration >= (seconds * 1000);
+    log_d("Checking if button was down for at least %d millis. Was down for %d millis.", (seconds * 1000), _lastButtonDownDuration);
+
+    return _lastButtonDownDuration >= (seconds * 1000);;
 }
 

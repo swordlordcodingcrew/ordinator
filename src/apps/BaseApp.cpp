@@ -33,6 +33,12 @@ BaseApp::~BaseApp()
     //delete _offscreen;
 }
 
+// standard apps only need runlevel 1, if you need higher, override this function
+RunLevel BaseApp::runLevelNeeded()
+{
+    return RL1;
+};
+
 void BaseApp::handleEvents(EventHandler* eh)
 {
     // call event handler without param for convenience
@@ -106,7 +112,7 @@ bool BaseApp::canWeGoToSleep()
 
 bool BaseApp::canSwitchAway()
 {
-
+    return true;
 }
 
 // Graphics

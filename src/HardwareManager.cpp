@@ -23,34 +23,152 @@
 
 HardwareManager::HardwareManager(HardwareSerial* hws) : _hs(hws)
 {
+    log_d("Initialising Hardware Manager");
+    initRL1();
+}
+
+RunLevel HardwareManager::getRunLevel()
+{
+    return _runLevel;
+}
+
+void HardwareManager::initRL1()
+{
+    if(_runLevel != RL0)
+    {
+        log_w("Can't initialise RunLevel 1 (%d)", _runLevel);
+        return;
+    }
+
+    log_i("Moving up to RunLevel 1");
     setCpuFrequencyMhz(80);
 
-    hws->print("CPU speed: ");
-    hws->println(getCpuFrequencyMhz());
+    log_i("CPU speed is %d", getCpuFrequencyMhz());
 
-    hws->print("Reset CPU 0: ");
-    hws->println(rtc_get_reset_reason(0));
-    hws->print("Reset CPU 1: ");
-    hws->println(rtc_get_reset_reason(1));
+    log_i("CPU reset codes. CPU0: %d, CPU1: %d", rtc_get_reset_reason(0), rtc_get_reset_reason(1));
+
+    initClock();
+    setupADC();
+    setupBattery();
+
+    _runLevel = RL1;
+}
+
+void HardwareManager::initRL2()
+{
+    if(_runLevel != RL1)
+    {
+        log_w("Can't initialise RunLevel 2 (%d)", _runLevel);
+        return;
+    }
+
+    log_i("Moving up to RunLevel 2");
 
     initSPIFFS();
-    setupADC();
+
+    _runLevel = RL2;
+}
+
+void HardwareManager::terminateRL2()
+{
+    if(_runLevel != RL2)
+    {
+        log_w("Can't terminate RunLevel 2 (%d)", _runLevel);
+        return;
+    }
+
+    SPIFFS.end();
+
+    log_i("Terminating RunLevel 2, switching to RunLevel 1");
+    _runLevel = RL1;
+}
+
+void HardwareManager::initRL3()
+{
+    if(_runLevel != RL2)
+    {
+        log_w("Can't initialise RunLevel 3 (%d)", _runLevel);
+        return;
+    }
+
+    log_i("Moving up to RunLevel 3");
+    // todo we could think about quicker clock speed in this mode...
     initMPU();
-    initClock();
-    setupBattery();
+
+    _runLevel = RL3;
+}
+
+void HardwareManager::terminateRL3()
+{
+    if(_runLevel != RL3)
+    {
+        log_w("Can't terminate RunLevel 3 (%d)", _runLevel);
+        return;
+    }
+
+    log_i("Terminating RunLevel 3, switching to RunLevel 2");
+    mpuSleep();
+    deactivateWifi();
+    deactivateBT();
+
+    _runLevel = RL2;
 }
 
 void HardwareManager::commenceSleep()
 {
-    mpuSleep();
-    deactivateWifi();
-    deactivateBT();
+    _runLevel = RL0;
+    log_i("Going into sleep mode");
+    delay(20);
+
     rtcSleep();
-    SPIFFS.end();
     pinMode(39, GPIO_MODE_INPUT);
     esp_sleep_enable_ext1_wakeup(GPIO_SEL_33 | GPIO_SEL_39, ESP_EXT1_WAKEUP_ANY_HIGH);
     esp_deep_sleep_disable_rom_logging();
     esp_deep_sleep_start();
+}
+
+bool HardwareManager::switchToRunLevel(RunLevel requestedRL)
+{
+    while(requestedRL != _runLevel)
+    {
+        if(requestedRL > _runLevel)
+        {
+            // moving up
+            switch(_runLevel)
+            {
+                case RL1:
+                    initRL2();
+                    break;
+                case RL2:
+                    initRL3();
+                    break;
+                default:
+                    log_e("non-reachable runlevel status reached, device will go up in flames now.");
+                    return false;
+            }
+        }
+        else
+        {
+            // going down
+            switch(_runLevel)
+            {
+                case RL3:
+                    terminateRL3();
+                    break;
+                case RL2:
+                    terminateRL2();
+                    break;
+                case RL1:
+                    commenceSleep();
+                    break;
+                default:
+                    log_e("non-reachable runlevel status reached, device will go up in flames now.");
+                    return false;
+            }
+        }
+    }
+
+    return true;
 }
 
 void HardwareManager::updateChargeLED()
@@ -58,8 +176,8 @@ void HardwareManager::updateChargeLED()
     digitalWrite(LED_PIN, isBatteryCharging());
 }
 
-bool HardwareManager::isBatteryCharging() {
-
+bool HardwareManager::isBatteryCharging()
+{
     return !digitalRead(CHARGE_PIN);
 }
 
@@ -112,14 +230,21 @@ void HardwareManager::adjustRTC()
     {
         _hs->println(&t, "New date/time: %A, %B %d %Y %H:%M:%S");
 
-        RTC_Date datetime = RTC_Date(t.tm_year, t.tm_mon, t.tm_mday, t.tm_hour, t.tm_min, t.tm_sec);
+        // year is since 1900
+        // month is starting at 0
+        RTC_Date datetime = RTC_Date(t.tm_year + 1900, t.tm_mon + 1, t.tm_mday, t.tm_hour, t.tm_min, t.tm_sec);
         _hs->print("Setting time to: ");
         _hs->print(datetime.hour);
         _hs->print(":");
         _hs->print(datetime.minute);
         _hs->print(":");
         _hs->print(datetime.second);
-        _hs->println();
+        _hs->print(" at the ");
+        _hs->print(datetime.day);
+        _hs->print(".");
+        _hs->print(datetime.month);
+        _hs->print(".");
+        _hs->println(datetime.year);
 
         _rtc.setDateTime(datetime);
     }

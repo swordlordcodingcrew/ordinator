@@ -34,6 +34,14 @@
 #include <rom/rtc.h>
 #include <time.h>
 
+enum RunLevel : uint8_t
+{
+    RL0 =0, // shutdown
+    RL1 =1, // display and clock
+    RL2 =2, // spiffs and battery
+    RL3 =3  // all the rest
+};
+
 class HardwareManager
 {
 public:
@@ -49,8 +57,6 @@ public:
     bool isBTRunning();
     bool isBLEServerRunning();
 
-    void commenceSleep();
-
     float getVoltage();
     uint8_t calcBatteryPercentage(float volts);
     bool isBatteryCharging();
@@ -64,6 +70,14 @@ public:
     void adjustRTC();
 
     void updateChargeLED();
+
+    RunLevel getRunLevel();
+    void initRL1();
+    void initRL2();
+    void terminateRL2();
+    void initRL3();
+    void terminateRL3();
+    bool switchToRunLevel(RunLevel requestedRL); // switches to the requested runlevel (going down as well).
 
 protected:
 
@@ -84,6 +98,8 @@ protected:
 
 private:
 
+    void commenceSleep();
+
     const char* ntpServer = "europe.pool.ntp.org";
 
     const float _BATTERY_MIN_V = 3.2;
@@ -99,6 +115,8 @@ private:
     MPU9250 _imu;
     PCF8563_Class _rtc;
     uint32_t _vref = 1100;
+
+    RunLevel _runLevel = RL0;
 };
 
 #endif //ORDINATOR_HARDWAREMANAGER_H

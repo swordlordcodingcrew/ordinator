@@ -25,6 +25,13 @@ AppBearing::AppBearing(HardwareSerial* hws, TFT_eSPI* s, HardwareManager* hwm) :
     _offscreen->fillScreen(TFT_YELLOW);
 }
 
+// standard apps only need runlevel RL1, if you need higher, override this function
+RunLevel AppBearing::runLevelNeeded()
+{
+    return RL3;
+};
+
+
 void AppBearing::handleEvents()
 {
 

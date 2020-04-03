@@ -22,6 +22,8 @@
 
 DisplayManager::DisplayManager(HardwareSerial* hs, TFT_eSPI* tft) : _tft(tft), _hs(hs)
 {
+    log_d("Initialising DisplayManager");
+
     // frame management
     setFrameRate(60);
     frameCount = 0;
@@ -30,10 +32,7 @@ DisplayManager::DisplayManager(HardwareSerial* hs, TFT_eSPI* tft) : _tft(tft), _
     // init not necessary, will be reset after first use
     // lastFrameStart
     // lastFrameDurationMs
-}
 
-void DisplayManager::begin()
-{
     _tft->init();
     _tft->setRotation(0); // 80x160
     _tft->setSwapBytes(true);
@@ -41,6 +40,8 @@ void DisplayManager::begin()
     ledcSetup(0, 5000, 8);
     ledcAttachPin(TFT_BL, 0);
     ledcWrite(0, 185);
+
+    log_d("Initialisation done");
 }
 
 TFT_eSPI* DisplayManager::getDisplay()
@@ -52,7 +53,7 @@ void DisplayManager::showBootLogo()
 {
     _tft->pushImage(0, 0, 80, 160, shield);
 
-    delay(250);
+    // delay(250);
 }
 
 //Frame management

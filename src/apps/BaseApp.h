@@ -23,6 +23,7 @@
 
 #include <EventHandler.h>
 #include <TFT_eSPI.h>
+#include <HardwareManager.h>
 #include "HardwareSerial.h"
 
 class BaseApp
@@ -31,7 +32,7 @@ public:
     BaseApp(HardwareSerial* hs, TFT_eSPI* tft);
     virtual ~BaseApp();
 
-    static const uint8_t APP_COUNT   = 8;
+    static const uint8_t APP_COUNT   = 9;
 
     static const uint8_t APP_DEFAULT = 0;
 
@@ -43,7 +44,7 @@ public:
     static const uint8_t APPID_BEARING          = 5;
     static const uint8_t APPID_BATTERY          = 6;
     static const uint8_t APPID_TEMPERATURE      = 7;
-    static const uint8_t APPID_OTA              = 8;
+    static const uint8_t APPID_OTA              = 8; // WARNING!! MAX APP COUNT
 
     /*
      * color codes
@@ -71,6 +72,10 @@ public:
     virtual bool getEnforceFramerate();
     virtual bool canWeGoToSleep();
     virtual bool canSwitchAway();
+
+    // return the runlevel needed for this app,
+    // the app manager does make sure the
+    virtual RunLevel runLevelNeeded();
 
     /// Clears display.
     void clear();

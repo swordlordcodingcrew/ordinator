@@ -29,9 +29,6 @@ class DisplayManager
 public:
     DisplayManager(HardwareSerial* hs, TFT_eSPI* tft);
 
-    /// Initializes the hardware
-    void begin();
-
     // Show the area41 logo
     void showBootLogo();
 

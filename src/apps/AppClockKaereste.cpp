@@ -32,6 +32,7 @@ void AppClockKaereste::handleEvents(EventHandler* eh)
     {
         _tft->fillScreen(TFT_VIOLET);
         _hwm->adjustRTC();
+        eh->resetLastEventTimestamp(); // or the screen goes blank after setting up the clock..
     }
 }
 

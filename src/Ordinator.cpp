@@ -32,18 +32,21 @@ void Ordinator::setup()
     Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN);
     Wire.setClock(400000);
 
+    // TODO decie if we should redirect log to SPIFFS
+    //esp_log_set_vprintf();
+    log_i("Welcome to your Ordinator. Booting up.");
+
+    // initialise the display
+    _dm = new DisplayManager(&Serial, &_tft);
+    _dm->showBootLogo();
+
     _eh = new EventHandler(&Serial);
     _eh->poll();
 
     // initialise the hardware manager
     _hwm = new HardwareManager(&Serial);
 
-    // initialise the display
-    _dm = new DisplayManager(&Serial, &_tft);
-    _dm->begin();
-    // todo: the boot logo is another module which gets replaced after a given time...
-    _dm->showBootLogo();
-
+    log_i("Initialise AppManager");
     // initialise the mode manager and implicitly the first mode to be run
     _mm = new AppManager(&Serial, _dm, _eh, _hwm);
 
@@ -51,8 +54,6 @@ void Ordinator::setup()
     btStop();
 
     _eh->resetLastEventTimestamp();
-
-    Serial.println("Welcome to your Ordinator. All systems are up.");
 }
 
 void Ordinator::loop()
@@ -67,8 +68,7 @@ void Ordinator::loop()
     uint32_t freeHeap = ESP.getFreeHeap();
     if(freeHeap != _lastFreeHeap)
     {
-        Serial.print("Free Heap: ");
-        Serial.println(freeHeap);
+        log_i("Free Heap: %d", freeHeap);
 
         _lastFreeHeap = freeHeap;
     }
@@ -95,5 +95,5 @@ void Ordinator::loop()
 void Ordinator::sleep()
 {
     _dm->commenceSleep();
-    _hwm->commenceSleep();
+    _hwm->switchToRunLevel(RL0);
 }

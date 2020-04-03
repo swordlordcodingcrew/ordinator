@@ -146,9 +146,9 @@ void AppManager::checkEvents()
     //  then we let the module do the configuration with the button presses
     // or we are in the normal mode
     //  then we switch to the next module
-
     if(_eh->isButtonJustReleased() && !_eh->buttonWasDownForAtLeast(2) && _currentApp->canSwitchAway())
     {
+        log_d("Can switch to next mode");
         switchToNextMode();
     }
 }
@@ -200,8 +200,7 @@ void AppManager::setMode(uint8_t newMode, uint8_t oldMode, bool storeMode)
         delete _currentApp;
     }
 
-    _hs->print("New mode is: ");
-    _hs->println(_currentAppID);
+    log_i("New mode is: %d", _currentAppID);
 
     // make sure that the config file contains the current mode
     // stores only standard apps, no easter eggs...
@@ -247,5 +246,8 @@ void AppManager::setMode(uint8_t newMode, uint8_t oldMode, bool storeMode)
             break;
     }
 
-    _hs->println("New App started");
+    // make sure that the required hw is initialised
+    _hwm->switchToRunLevel(_currentApp->runLevelNeeded());
+
+    log_d("New App started");
 }
