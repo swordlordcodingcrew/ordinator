@@ -1,13 +1,14 @@
 name: "CodeQL"
 
+#deactivated since codeql does not platformio builds...
 on:
   push:
-    branches: [master, ]
+    branches: [nondefined, ]
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: [master]
-  schedule:
-    - cron: '0 1 * * 5'
+    branches: [nondefined]
+  #schedule:
+  #  - cron: '0 1 * * 5'
 
 jobs:
   analyse:
